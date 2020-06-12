@@ -47,7 +47,7 @@ namespace Order.Assistant.CodeFirst.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("x_customer");
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("Order.Assistant.CodeFirst.Data.Entity.CustomerSku", b =>
@@ -87,7 +87,7 @@ namespace Order.Assistant.CodeFirst.Data.Migrations
 
                     b.HasIndex("SkuId");
 
-                    b.ToTable("x_customerSku");
+                    b.ToTable("CustomerSku");
                 });
 
             modelBuilder.Entity("Order.Assistant.CodeFirst.Data.Entity.Order", b =>
@@ -172,7 +172,7 @@ namespace Order.Assistant.CodeFirst.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("x_order");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("Order.Assistant.CodeFirst.Data.Entity.OrderItem", b =>
@@ -223,7 +223,7 @@ namespace Order.Assistant.CodeFirst.Data.Migrations
 
                     b.HasIndex("SkuId");
 
-                    b.ToTable("x_orderItem");
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("Order.Assistant.CodeFirst.Data.Entity.Sku", b =>
@@ -260,7 +260,7 @@ namespace Order.Assistant.CodeFirst.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("x_sku");
+                    b.ToTable("Sku");
                 });
 
             modelBuilder.Entity("Order.Assistant.CodeFirst.Data.Entity.CustomerSku", b =>

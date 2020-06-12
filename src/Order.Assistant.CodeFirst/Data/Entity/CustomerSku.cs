@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Order.Assistant.CodeFirst.Data.Entity
 {
-    [Table("x_customerSku")]
     public class CustomerSku : BaseEntity
     {
         /// <summary>
