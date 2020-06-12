@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10.Coldairarrow.UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03.Coldairarrow.IBusiness", "Coldairarrow.IBusiness\03.Coldairarrow.IBusiness.csproj", "{4422EF5A-9E20-450D-B0BD-643DED2B9219}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.Assistant.CodeFirst", "Order.Assistant.CodeFirst\Order.Assistant.CodeFirst.csproj", "{497CC29F-1BEF-4416-9101-DF8DC36CB898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{4422EF5A-9E20-450D-B0BD-643DED2B9219}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4422EF5A-9E20-450D-B0BD-643DED2B9219}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4422EF5A-9E20-450D-B0BD-643DED2B9219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{497CC29F-1BEF-4416-9101-DF8DC36CB898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{497CC29F-1BEF-4416-9101-DF8DC36CB898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{497CC29F-1BEF-4416-9101-DF8DC36CB898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{497CC29F-1BEF-4416-9101-DF8DC36CB898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
