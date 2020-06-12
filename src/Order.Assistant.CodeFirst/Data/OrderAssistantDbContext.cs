@@ -29,5 +29,15 @@ namespace Order.Assistant.CodeFirst
         /// 客户sku表
         /// </summary>
         public DbSet<CustomerSku> CustomerSku { get; set; }
+
+        /// <summary>
+        /// 订单表
+        /// </summary>
+        public DbSet<Data.Entity.Order> Order { get; set; }
+
+        /// <summary>
+        /// 订单明细表
+        /// </summary>
+        public DbSet<OrderItem> OrderItem { get; set; }
     }
 }

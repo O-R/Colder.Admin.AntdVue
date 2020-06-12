@@ -7,37 +7,51 @@ using System.Threading.Tasks;
 
 namespace Order.Assistant.CodeFirst.Data.Entity
 {
-    [Table("x_customerSku")]
-    public class CustomerSku : BaseEntity
+    [Table("x_orderItem")]
+    public class OrderItem : BaseEntity
     {
+        [StringLength(50)]
+        public string OrderId { get; set; }
+
         /// <summary>
-        /// 客户ID
+        /// 订单
+        /// </summary>
+        [ForeignKey("OrderId")]
+        public Order Order { get; set; }
+
+        /// <summary>
+        /// sku编号
         /// </summary>
         [StringLength(50)]
-        public string CustomerId { get; set; }
+        public string SkuNo { get; set; }
 
         /// <summary>
-        /// 客户
-        /// </summary>
-        [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
-
-
-        /// <summary>
-        /// skuID
+        /// skuId
         /// </summary>
         [StringLength(50)]
         public string SkuId { get; set; }
 
         /// <summary>
-        /// sku
+        /// Sku
         /// </summary>
         [ForeignKey("SkuId")]
         public Sku Sku { get; set; }
 
         /// <summary>
-        /// 价格
+        /// 商品名称
+        /// </summary>
+        [StringLength(100)]
+        public string SkuName { get; set; }
+
+        /// <summary>
+        /// 单价
         /// </summary>
         public decimal Price { get; set; }
+
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public int Count { get; set; }
+
     }
 }

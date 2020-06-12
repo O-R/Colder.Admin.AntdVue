@@ -14,14 +14,14 @@ namespace Order.Assistant.CodeFirst.Data.Entity
         /// sku编号
         /// </summary>
         [StringLength(50)]
-        public string Number { get; set; }
+        public string SkuNo { get; set; }
 
 
         /// <summary>
         /// 商品名称
         /// </summary>
         [StringLength(100)]
-        public string Name { get; set; }
+        public string SkuName { get; set; }
 
         /// <summary>
         /// 关键词

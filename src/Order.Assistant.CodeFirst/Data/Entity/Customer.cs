@@ -14,13 +14,13 @@ namespace Order.Assistant.CodeFirst.Data.Entity
         /// 客户编号
         /// </summary>
         [StringLength(50)]
-        public string Number { get; set; }
+        public string CustomerNo { get; set; }
 
 
         /// <summary>
         /// 客户名称
         /// </summary>
         [StringLength(50)]
-        public string Name { get; set; }
+        public string CustomerName { get; set; }
     }
 }
