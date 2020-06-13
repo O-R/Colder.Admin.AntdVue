@@ -1,21 +1,74 @@
-
-<!-- <a-steps :current="1" size="small"> -->
-
 <template>
-  <a-steps :current="step">
-    <a-step title="请选择下单客户" />
-    <a-step title="请录入信息" />
-    <a-step title="完成" />
-  </a-steps>
-</template>
 
+  <a-card :bordered="false">
+    <div>
+      <a-steps :current="current">
+        <a-step v-for="item in steps" :key="item.title" :title="item.title" />
+      </a-steps>
+      <div class="steps-content">
+        {{ steps[current].content }}
+      </div>
+      <div class="steps-action">
+        <a-button v-if="current < steps.length - 1" type="primary" @click="next">
+          Next
+        </a-button>
+        <a-button
+          v-if="current == steps.length - 1"
+          type="primary"
+          @click="$message.success('Processing complete!')"
+        >
+          Done
+        </a-button>
+        <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">
+          Previous
+        </a-button>
+      </div>
+    </div>
+  </a-card>
+</template>
 <script>
 export default {
-
-  data () {
+  data() {
     return {
-      step: 0
-    }
-  }
-}
+      current: 0,
+      steps: [
+        {
+          title: '请选择下单客户',
+          content: 'First-content',
+        },
+        {
+          title: '请录入信息',
+          content: 'Second-content',
+        },
+        {
+          title: '完成',
+          content: 'Last-content',
+        },
+      ],
+    };
+  },
+  methods: {
+    next() {
+      this.current++;
+    },
+    prev() {
+      this.current--;
+    },
+  },
+};
 </script>
+<style scoped>
+.steps-content {
+  margin-top: 16px;
+  border: 1px dashed #e9e9e9;
+  border-radius: 6px;
+  background-color: #fafafa;
+  min-height: 200px;
+  text-align: center;
+  padding-top: 80px;
+}
+
+.steps-action {
+  margin-top: 24px;
+}
+</style>
