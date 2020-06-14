@@ -12,5 +12,7 @@ namespace Coldairarrow.Business.OrderAssistant
         Task AddDataAsync(Customer data);
         Task UpdateDataAsync(Customer data);
         Task DeleteDataAsync(List<string> ids);
+
+        Task<List<CustomerSku>> GetCustomerSkuList(string customerId);
     }
 }

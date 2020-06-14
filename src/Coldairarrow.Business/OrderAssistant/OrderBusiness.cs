@@ -10,25 +10,25 @@ using System.Threading.Tasks;
 
 namespace Coldairarrow.Business.OrderAssistant
 {
-    public class CustomerBusiness : BaseBusiness<Customer>, ICustomerBusiness, ITransientDependency
+    public class OrderBusiness : BaseBusiness<Order>, IOrderBusiness, ITransientDependency
     {
-        public CustomerBusiness(IRepository repository)
+        public OrderBusiness(IRepository repository)
             : base(repository)
         {
         }
 
         #region 外部接口
 
-        public async Task<PageResult<Customer>> GetDataListAsync(PageInput<ConditionDTO> input)
+        public async Task<PageResult<Order>> GetDataListAsync(PageInput<ConditionDTO> input)
         {
             var q = GetIQueryable();
-            var where = LinqHelper.True<Customer>();
+            var where = LinqHelper.True<Order>();
             var search = input.Search;
 
             //筛选
             if (!search.Condition.IsNullOrEmpty() && !search.Keyword.IsNullOrEmpty())
             {
-                var newWhere = DynamicExpressionParser.ParseLambda<Customer, bool>(
+                var newWhere = DynamicExpressionParser.ParseLambda<Order, bool>(
                     ParsingConfig.Default, false, $@"{search.Condition}.Contains(@0)", search.Keyword);
                 where = where.And(newWhere);
             }
@@ -36,17 +36,17 @@ namespace Coldairarrow.Business.OrderAssistant
             return await q.Where(where).GetPageResultAsync(input);
         }
 
-        public async Task<Customer> GetTheDataAsync(string id)
+        public async Task<Order> GetTheDataAsync(string id)
         {
             return await GetEntityAsync(id);
         }
 
-        public async Task AddDataAsync(Customer data)
+        public async Task AddDataAsync(Order data)
         {
             await InsertAsync(data);
         }
 
-        public async Task UpdateDataAsync(Customer data)
+        public async Task UpdateDataAsync(Order data)
         {
             await UpdateAsync(data);
         }
@@ -56,18 +56,9 @@ namespace Coldairarrow.Business.OrderAssistant
             await DeleteAsync(ids);
         }
 
-        public async Task<List<CustomerSku>> GetCustomerSkuList(string customerId)
+        public async Task AddManyDataAsync(List<Order> orders)
         {
-            var result = await Service.GetIQueryable<CustomerSku>()
-                  .Include(cs => cs.Sku)
-                  .Where(cs => cs.CustomerId == customerId)
-                  .ToListAsync();
-
-            if (result != null && result.Any())
-            {
-                return result.OrderBy(it => it.Id).ToList();
-            }
-            return new List<CustomerSku>();
+            await InsertAsync(orders);
         }
 
         #endregion

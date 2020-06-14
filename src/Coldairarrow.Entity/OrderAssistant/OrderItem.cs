@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace Coldairarrow.Entity.OrderAssistant
 {
     /// <summary>
-    /// Sku
+    /// OrderItem
     /// </summary>
-    [Table("Sku")]
-    public class Sku
+    [Table("OrderItem")]
+    public class OrderItem
     {
 
         /// <summary>
@@ -40,9 +38,19 @@ namespace Coldairarrow.Entity.OrderAssistant
         public Boolean Deleted { get; set; }
 
         /// <summary>
+        /// OrderId
+        /// </summary>
+        public String OrderId { get; set; }
+
+        /// <summary>
         /// sku编号
         /// </summary>
         public String SkuNo { get; set; }
+
+        /// <summary>
+        /// SkuId
+        /// </summary>
+        public String SkuId { get; set; }
 
         /// <summary>
         /// sku名称
@@ -50,24 +58,14 @@ namespace Coldairarrow.Entity.OrderAssistant
         public String SkuName { get; set; }
 
         /// <summary>
-        /// 关键词
+        /// 单价
         /// </summary>
-        public String KeyWords { get; set; }
-
+        public Decimal Price { get; set; }
 
         /// <summary>
-        /// 关联客户
+        /// 数量
         /// </summary>
-        public List<CustomerSku> SkuCustomers { get; set; }
-
-        [NotMapped]
-        public List<string> KeyworkList
-        {
-            get
-            {
-                return this.KeyWords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
-        }
+        public Int32 Count { get; set; }
 
     }
 }

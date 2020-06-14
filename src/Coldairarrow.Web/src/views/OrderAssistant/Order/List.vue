@@ -18,8 +18,19 @@
           <a-col :md="4" :sm="24">
             <a-form-item label="查询类别">
               <a-select allowClear v-model="queryParam.condition">
+                <a-select-option key="OrderNo">订单编号</a-select-option>
                 <a-select-option key="CustomerNo">客户编号</a-select-option>
-                <a-select-option key="CustomerName">客户名称</a-select-option>
+                <a-select-option key="CustomerName">客户名</a-select-option>
+                <a-select-option key="CustomerId">客户Id</a-select-option>
+                <a-select-option key="ProvinceNo">ProvinceNo</a-select-option>
+                <a-select-option key="Province">省</a-select-option>
+                <a-select-option key="CityNo">CityNo</a-select-option>
+                <a-select-option key="City">市</a-select-option>
+                <a-select-option key="AreaNo">AreaNo</a-select-option>
+                <a-select-option key="Area">区</a-select-option>
+                <a-select-option key="Address">详细地址</a-select-option>
+                <a-select-option key="Receiver">收货人</a-select-option>
+                <a-select-option key="ReceiverPhone">收货人手机号</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -65,8 +76,21 @@
 import EditForm from './EditForm'
 
 const columns = [
+  { title: '订单编号', dataIndex: 'OrderNo', width: '10%' },
   { title: '客户编号', dataIndex: 'CustomerNo', width: '10%' },
-  { title: '客户名称', dataIndex: 'CustomerName', width: '10%' },
+  { title: '客户名', dataIndex: 'CustomerName', width: '10%' },
+  { title: '客户Id', dataIndex: 'CustomerId', width: '10%' },
+  { title: 'ProvinceNo', dataIndex: 'ProvinceNo', width: '10%' },
+  { title: '省', dataIndex: 'Province', width: '10%' },
+  { title: 'CityNo', dataIndex: 'CityNo', width: '10%' },
+  { title: '市', dataIndex: 'City', width: '10%' },
+  { title: 'AreaNo', dataIndex: 'AreaNo', width: '10%' },
+  { title: '区', dataIndex: 'Area', width: '10%' },
+  { title: '详细地址', dataIndex: 'Address', width: '10%' },
+  { title: '收货人', dataIndex: 'Receiver', width: '10%' },
+  { title: '收货人手机号', dataIndex: 'ReceiverPhone', width: '10%' },
+  { title: '折扣', dataIndex: 'Discount', width: '10%' },
+  { title: '总价', dataIndex: 'TotalPrice', width: '10%' },
   { title: '操作', dataIndex: 'action', scopedSlots: { customRender: 'action' } }
 ]
 
@@ -74,10 +98,10 @@ export default {
   components: {
     EditForm
   },
-  mounted () {
+  mounted() {
     this.getDataList()
   },
-  data () {
+  data() {
     return {
       data: [],
       pagination: {
@@ -94,18 +118,18 @@ export default {
     }
   },
   methods: {
-    handleTableChange (pagination, filters, sorter) {
+    handleTableChange(pagination, filters, sorter) {
       this.pagination = { ...pagination }
       this.filters = { ...filters }
       this.sorter = { ...sorter }
       this.getDataList()
     },
-    getDataList () {
+    getDataList() {
       this.selectedRowKeys = []
 
       this.loading = true
       this.$http
-        .post('/OrderAssistant/Customer/GetDataList', {
+        .post('/OrderAssistant/Order/GetDataList', {
           PageIndex: this.pagination.current,
           PageRows: this.pagination.pageSize,
           SortField: this.sorter.field || 'Id',
@@ -121,25 +145,25 @@ export default {
           this.pagination = pagination
         })
     },
-    onSelectChange (selectedRowKeys) {
+    onSelectChange(selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
-    hasSelected () {
+    hasSelected() {
       return this.selectedRowKeys.length > 0
     },
-    hanldleAdd () {
+    hanldleAdd() {
       this.$refs.editForm.openForm()
     },
-    handleEdit (id) {
+    handleEdit(id) {
       this.$refs.editForm.openForm(id)
     },
-    handleDelete (ids) {
+    handleDelete(ids) {
       var thisObj = this
       this.$confirm({
         title: '确认删除吗?',
-        onOk () {
+        onOk() {
           return new Promise((resolve, reject) => {
-            thisObj.$http.post('/OrderAssistant/Customer/DeleteData', ids).then(resJson => {
+            thisObj.$http.post('/OrderAssistant/Order/DeleteData', ids).then(resJson => {
               resolve()
 
               if (resJson.Success) {

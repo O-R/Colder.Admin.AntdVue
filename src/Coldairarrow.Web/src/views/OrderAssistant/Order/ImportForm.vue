@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <a-modal
     :title="title"
     width="40%"
@@ -9,11 +9,11 @@
   >
     <a-spin :spinning="loading">
       <a-form-model ref="form" :model="entity" :rules="rules" v-bind="layout">
-        <a-form-model-item label="客户编号" prop="CustomerNo">
-          <a-input v-model="entity.CustomerNo" autocomplete="off" />
+        <a-form-model-item label="地址" prop="address">
+          <a-input v-model="entity.address" autocomplete="off" />
         </a-form-model-item>
-        <a-form-model-item label="客户名称" prop="CustomerName">
-          <a-input v-model="entity.CustomerName" autocomplete="off" />
+        <a-form-model-item label="型号" prop="skus">
+          <a-input v-model="entity.skus" autocomplete="off" />
         </a-form-model-item>
       </a-form-model>
     </a-spin>
@@ -46,16 +46,12 @@ export default {
         this.$refs['form'].clearValidate()
       })
     },
-    openForm (id, title) {
+    openForm (title, id) {
       this.init()
+      this.title = title
 
       if (id) {
-        this.loading = true
-        this.$http.post('/OrderAssistant/Customer/GetTheData', { id: id }).then(resJson => {
-          this.loading = false
-
-          this.entity = resJson.Data
-        })
+        // this.loading = true
       }
     },
     handleSubmit () {
@@ -63,19 +59,9 @@ export default {
         if (!valid) {
           return
         }
-        this.loading = true
-        this.$http.post('/OrderAssistant/Customer/SaveData', this.entity).then(resJson => {
-          this.loading = false
-
-          if (resJson.Success) {
-            this.$message.success('操作成功!')
-            this.visible = false
-
-            this.parentObj.getDataList()
-          } else {
-            this.$message.error(resJson.Msg)
-          }
-        })
+        this.parentObj.add(this.entity)
+        this.visible = false
+        this.$message.success('操作成功!')
       })
     }
   }
