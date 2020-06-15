@@ -32,7 +32,7 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
         [HttpPost]
         public async Task<Sku> GetTheData(IdInputDTO input)
         {
-            return await _skuBus.GetTheDataAsync(input.id);
+            return await _skuBus.GetSkuWithPriceAsync(input.id);
         }
 
         #endregion
@@ -45,6 +45,11 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             if (data.Id.IsNullOrEmpty())
             {
                 InitEntity(data);
+
+                data.SkuCustomers.ForEach(sc=> {
+                
+                    sc.id
+                })
 
                 await _skuBus.AddDataAsync(data);
             }

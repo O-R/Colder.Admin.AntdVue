@@ -65,7 +65,7 @@ namespace Coldairarrow.Entity.OrderAssistant
         {
             get
             {
-                return this.KeyWords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                return this.KeyWords?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList()??new List<string>();
             }
         }
 

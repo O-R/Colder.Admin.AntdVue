@@ -150,7 +150,7 @@ export default {
     },
     add (row) {
       const { data } = this
-      var i = data[data.length - 1].idx
+      var i = data.length > 0 ? data[data.length - 1].idx : 0
       row.idx = i + 1
       row.key = i.toString()
       const addData = [...data, row]

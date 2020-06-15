@@ -177,27 +177,28 @@ export default {
       default: false
     }
   },
-  created () {
-    this.$on('changeCustomerId', id => {
-      this.customerId = id
-      if (id !== '') {
-        this.getSkuDataList(id)
-      }
-    }) 
-  },
   mounted () {
-    console.log(this.customerId)
+    this.getSkuDataList()
   },
   data () {
     // const data = this.orders
     // this.setCacheData(data)
     return {
       data: [],
-      customerId: '',
       skuData: [],
       excel_fields: excelFields,
       columns,
       editingKey: ''
+    }
+  },
+  computed: {
+    listentCustomerId () {
+      return this.$store.state.app.selectedCustomerId
+    }
+  },
+  watch: {
+    listentCustomerId: function (val) {
+      this.getSkuDataList()
     }
   },
   methods: {
@@ -276,7 +277,8 @@ export default {
         this.data = newData
       }
     },
-    getSkuDataList (customerId) {
+    getSkuDataList () {
+      var customerId = this.$store.state.app.selectedCustomerId
       this.$http
         .post('/OrderAssistant/Customer/GetSkuList', {
           CustomerId: customerId

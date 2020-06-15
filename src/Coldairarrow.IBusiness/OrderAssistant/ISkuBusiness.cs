@@ -9,8 +9,11 @@ namespace Coldairarrow.Business.OrderAssistant
     {
         Task<PageResult<Sku>> GetDataListAsync(PageInput<ConditionDTO> input);
         Task<Sku> GetTheDataAsync(string id);
+        Task<Sku> GetSkuWithPriceAsync(string id);
         Task AddDataAsync(Sku data);
         Task UpdateDataAsync(Sku data);
         Task DeleteDataAsync(List<string> ids);
+
+
     }
 }

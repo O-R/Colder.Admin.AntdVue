@@ -76,9 +76,10 @@ export default {
   methods: {
     next () {
       this.isNextClick = true
+      var customerId = this.$store.state.app.selectedCustomerId
       if (this.current === 0) {
-        var customerId = this.$refs.customerList.getCustomerId()
-        if (customerId === '') {
+        // var customerId = this.$refs.customerList.getCustomerId()
+        if (customerId === '' || customerId == undefined || customerId == null) {
           this.$message.warn('请先选择客户!')
         } else {
           this.current++
@@ -89,6 +90,8 @@ export default {
         var parseData = this.$refs.importList.getParseData()
         if (parseData.length === 0) {
           this.$message.warn('请先录入信息!')
+          this.loading = false
+          this.isNextClick = false
         } else {
           const defaultItem = {
             index: 0,
@@ -113,7 +116,8 @@ export default {
           })
 
           const postData = {
-            CustomerId: this.$refs.customerList.getCustomerId(),
+            // CustomerId: this.$refs.customerList.getCustomerId(),
+            CustomerId: customerId,
             Orders: list
           }
 

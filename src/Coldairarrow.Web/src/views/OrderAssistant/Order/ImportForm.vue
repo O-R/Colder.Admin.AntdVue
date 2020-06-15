@@ -10,10 +10,10 @@
     <a-spin :spinning="loading">
       <a-form-model ref="form" :model="entity" :rules="rules" v-bind="layout">
         <a-form-model-item label="地址" prop="address">
-          <a-input v-model="entity.address" autocomplete="off" />
+          <a-textarea v-model="entity.address" placeholder="" :rows="4" autocomplete="off"/>
         </a-form-model-item>
         <a-form-model-item label="型号" prop="skus">
-          <a-input v-model="entity.skus" autocomplete="off" />
+          <a-textarea v-model="entity.skus" placeholder="" :rows="4" autocomplete="off"/>
         </a-form-model-item>
       </a-form-model>
     </a-spin>

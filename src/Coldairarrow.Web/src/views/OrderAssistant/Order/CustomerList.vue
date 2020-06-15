@@ -23,6 +23,13 @@ export default {
   mounted () {
     this.getDataList()
   },
+
+  // :defaultValue="selectedCustomerName"
+  // computed: {
+  //   selectedCustomerName () {
+  //     return this.$store.state.app.selectedCustomerId
+  //   }
+  // },
   data () {
     return {
       data: [],
@@ -61,12 +68,13 @@ export default {
           this.pagination = pagination
         })
     },
-    getCustomerId () {
-      return this.customerId
-    },
+    // getCustomerId () {
+    //   return this.customerId
+    // },
     handleChange (value) {
-      this.customerId = value
-      this.$emit('changeCustomerId', this.customerId)
+      this.$store.commit('SET_SELECTED_CUSTOMERID', value)
+      // this.customerId = value
+      // this.$emit('changeCustomerId', this.customerId)
     },
     handleBlur () {
     //   console.log('blur');
