@@ -15,4 +15,25 @@ namespace Coldairarrow.Business.OrderAssistant
 
         Task<List<CustomerSku>> GetCustomerSkuList(string customerId);
     }
+
+    public class CustomerSkuDTO
+    {
+        public string CustomerId { get; set; }
+
+        /// <summary>
+        /// sku id
+        /// </summary>
+        public string Id { get; set; }
+
+        public string SkuNo { get; set; }
+
+        public string SkuName { get; set; }
+
+        public decimal Price { get; set; }
+    }
+
+    public class CustomerSkuInputDTO
+    {
+        public string CustomerId { get; set; }
+    }
 }

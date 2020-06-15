@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using NodaTime.Extensions;
 
 namespace Coldairarrow.Api.Controllers.OrderAssistant
 {
@@ -28,6 +30,11 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
 
         #region 提交
 
+        /// <summary>
+        /// 第二步：解析
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<List<OrderParseDTO>> Parse(OrderParseInputDTO data)
         {
@@ -130,8 +137,6 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                 orders.Add(order);
             });
 
-            //await _orderBus.AddManyDataAsync(orders);
-
             var result = new List<OrderParseDTO>();
             foreach (var ord in orders)
             {
@@ -158,7 +163,7 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                         ReceiverPhone = ord.ReceiverPhone,
                         SkuName = item.SkuName,
                         SkuNo = item.SkuNo,
-                        SkuId = item.Id,
+                        SkuId = item.SkuId,
                         OrderId = ord.Id,
                         CustomerId = customer.Id,
                         TotalPrice = ord.TotalPrice
@@ -169,6 +174,85 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             return result;
         }
 
+
+
+        /// <summary>
+        /// 第三步保存
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task SaveList(List<OrderParseDTO> list)
+        {
+            var addOrders = new List<Order>();
+            var updateOrders = new List<Order>();
+            if (list == null || !list.Any())
+            {
+                throw new BusException("没有可保存的数据");
+            }
+
+
+            //var orderItemIds = list.Select(li => li.Id).ToList();
+            //var existsItemIds = await _orderBus.GetExistsIdsAsync(orderItemIds);
+
+            var op = HttpContext.RequestServices.GetService<IOperator>();
+
+            var creatorId = op?.UserId;
+            var creatorRealName = op?.Property?.RealName;
+            var createTime = DateTime.Now;
+
+
+            /*.Where(it => !existsItemIds.Contains(it.Id))*/
+            list
+            .OrderBy(it => it.OrderNo).GroupBy(it => it.OrderId).ForEach(ord =>
+              {
+                  var items = ord.ToList();
+                  var firstItem = items.FirstOrDefault();
+
+                  var order = new Order()
+                  {
+                      Id = firstItem.OrderId,
+                      OrderNo = firstItem.OrderNo,
+                      CreateTime = createTime,
+                      CreatorId = creatorId,
+                      CreatorRealName = creatorRealName,
+                      CustomerId = firstItem.CustomerId,
+                      CustomerName = firstItem.CustomerName,
+                      CustomerNo = firstItem.CustomerNo,
+                      TotalPrice = Math.Round(items.Sum(itm => itm.Price * itm.Count), 2, MidpointRounding.AwayFromZero),
+                      Discount = firstItem.Discount,
+                      Province = firstItem.Province,
+                      ProvinceNo = firstItem.ProvinceNo,
+                      City = firstItem.City,
+                      CityNo = firstItem.CityNo,
+                      Area = firstItem.Area,
+                      AreaNo = firstItem.AreaNo,
+                      Address = firstItem.Address,
+                      Receiver = firstItem.Receiver,
+                      ReceiverPhone = firstItem.ReceiverPhone,
+
+                      OrderItems = items.Select(itm => new OrderItem()
+                      {
+                          Id = itm.Id,
+                          CreateTime = createTime,
+                          CreatorId = creatorId,
+                          CreatorRealName = creatorRealName,
+                          Count = itm.Count,
+                          OrderId = firstItem.OrderId,
+                          Price = itm.Price,
+                          SkuId = itm.SkuId,
+                          SkuName = itm.SkuName,
+                          SkuNo = itm.SkuNo
+                      })?.ToList() ?? new List<OrderItem>()
+                  };
+                  addOrders.Add(order);
+              });
+
+            if (addOrders.Any())
+            {
+                await _orderBus.AddManyDataAsync(addOrders);
+            }
+        }
         #endregion
     }
 }

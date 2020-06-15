@@ -8,13 +8,16 @@ namespace Coldairarrow.Business.OrderAssistant
 {
     public interface IOrderBusiness
     {
+        Task<List<string>> GetExistsIdsAsync(List<string> inputItemIds);
         Task<PageResult<Order>> GetDataListAsync(PageInput<ConditionDTO> input);
+
         Task<Order> GetTheDataAsync(string id);
         Task AddDataAsync(Order data);
         Task UpdateDataAsync(Order data);
         Task DeleteDataAsync(List<string> ids);
 
         Task AddManyDataAsync(List<Order> orders);
+        Task UpdateManyDataAsync(List<Order> orders);
     }
 
 

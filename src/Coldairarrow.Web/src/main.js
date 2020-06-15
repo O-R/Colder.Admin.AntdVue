@@ -19,7 +19,7 @@ import operatorPlugin from './utils/plugin/operator-plugin'
 import smartParse from 'vue-smart-parse'
 
 import moment from 'moment'
-moment.prototype.toJSON = function () { return moment(this).format("YYYY-MM-DD HH:mm:ss") }
+moment.prototype.toJSON = function () { return moment(this).format('YYYY-MM-DD HH:mm:ss') }
 
 Vue.config.productionTip = false
 

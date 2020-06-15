@@ -64,7 +64,7 @@ export default {
   props: {
     parentObj: Object
   },
-  data() {
+  data () {
     return {
       layout: {
         labelCol: { span: 5 },
@@ -78,14 +78,14 @@ export default {
     }
   },
   methods: {
-    init() {
+    init () {
       this.visible = true
       this.entity = {}
       this.$nextTick(() => {
         this.$refs['form'].clearValidate()
       })
     },
-    openForm(id, title) {
+    openForm (id, title) {
       this.init()
 
       if (id) {
@@ -97,7 +97,7 @@ export default {
         })
       }
     },
-    handleSubmit() {
+    handleSubmit () {
       this.$refs['form'].validate(valid => {
         if (!valid) {
           return

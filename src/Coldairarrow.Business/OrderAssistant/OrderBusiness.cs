@@ -60,6 +60,22 @@ namespace Coldairarrow.Business.OrderAssistant
         {
             await InsertAsync(orders);
         }
+        public async Task UpdateManyDataAsync(List<Order> orders)
+        {
+            await UpdateAsync(orders);
+        }
+
+        public async Task<List<string>> GetExistsIdsAsync(List<string> inputItemIds)
+        {
+            var ids = new List<string>();
+            if (inputItemIds == null || !inputItemIds.Any())
+            {
+                return ids;
+            }
+            return (await Service.GetIQueryable<OrderItem>()
+                .Where(ord => inputItemIds.Contains(ord.Id))
+                .Select(ord => ord.Id).ToListAsync()) ?? ids;
+        }
 
         #endregion
 

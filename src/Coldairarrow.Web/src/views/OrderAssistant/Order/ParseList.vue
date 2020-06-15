@@ -1,8 +1,16 @@
 <template>
   <div style="text-align: right">
-    <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" >
-      编辑
-    </a-button>
+
+    <download-excel
+      :data="data"
+      :fields="excel_fields"
+      :before-generate="startDownload"
+      :before-finish="finishDownload"
+      name="订单.xls">
+      <a-button type="primary" class="editable-add-btn" :loading="loading" >
+        导出excel
+      </a-button>
+    </download-excel>
     <a-table :columns="columns" :data-source="data" :scroll="{ x: '200%' }" :loading="loading" bordered>
       <template
         v-for="col in ['Province','City','Area','Address','Receiver','ReceiverPhone','SkuNo','Count','Price']"
@@ -10,8 +18,25 @@
         slot-scope="text, record"
       >
         <div :key="col">
+          <a-select
+            v-if="record.editable && col==='SkuNo'"
+            :default-value="record.SkuNo"
+            show-search
+            placeholder="请选择SKU编号"
+            option-filter-prop="children"
+            :filter-option="filterOption"
+            @change="val => handleSkuChange(val, record.Id, col)"
+            style="margin: -5px 0;width: 100%"
+          >
+            <a-select-option
+              v-for="(item, index) in skuData"
+              :key="index"
+              :value="item.Id">
+              {{ item.SkuNo }}
+            </a-select-option>
+          </a-select>
           <a-input
-            v-if="record.editable"
+            v-else-if="record.editable"
             style="margin: -5px 0"
             :value="text"
             @change="e => handleChange(e.target.value, record.Id, col)"
@@ -41,6 +66,11 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
+import JsonExcel from 'vue-json-excel'
+
+Vue.component('downloadExcel', JsonExcel)
+
 const columns = [
   {
     title: '原始编号',
@@ -125,22 +155,58 @@ const columns = [
     scopedSlots: { customRender: 'operation' }
   }
 ]
+const excelFields = {
+  '原始编号': 'OrderNo',
+  '生成时间': 'CreateTime',
+  '客户账号': 'CustomerNo',
+  '省': 'Province',
+  '市': 'City',
+  '区': 'Area',
+  '收货地址': 'Address',
+  '收货人姓名': 'Receiver',
+  '收货人手机': 'ReceiverPhone',
+  '商品编号/sku编号': 'SkuNo',
+  '数量': 'Count',
+  '单价': 'Price'
+}
 
 export default {
+  props: {
+    loading: {
+      type: Boolean,
+      default: false
+    }
+  },
+  created () {
+    this.$on('changeCustomerId', id => {
+      this.customerId = id
+      if (id !== '') {
+        this.getSkuDataList(id)
+      }
+    }) 
+  },
+  mounted () {
+    console.log(this.customerId)
+  },
   data () {
     // const data = this.orders
     // this.setCacheData(data)
     return {
       data: [],
+      customerId: '',
+      skuData: [],
+      excel_fields: excelFields,
       columns,
-      editingKey: '',
-      loading: false
+      editingKey: ''
     }
   },
   methods: {
     setData (d) {
       this.data = d
       this.setCacheData(d)
+    },
+    getData () {
+      return this.data
     },
     setCacheData (d) {
       this.cacheData = d.map(item => ({ ...item }))
@@ -153,23 +219,24 @@ export default {
         this.data = newData
       }
     },
+    handleSkuChange (value, key, column) {
+      const newData = [...this.data]
+      const target = newData.filter(item => key === item.Id)[0]
+
+      const sku = this.skuData.filter(sd => sd.Id === value)[0]
+      if (target) {
+        target.SkuId = value
+        target.SkuNo = sku.SkuNo
+        target.SkuName = sku.SkuName
+        target.Price = sku.Price
+        this.data = newData
+      }
+    },
     onDelete (key) {
       const dataSource = [...this.data]
       const filterData = dataSource.filter(item => item.Id !== key)
       this.data = filterData
       this.setCacheData(filterData)
-    },
-    hanldleAdd () {
-    //   this.$refs.importForm.openForm('新增')
-    },
-    add (row) {
-    //   const { data } = this
-    //   var i = data[data.length - 1].idx
-    //   row.idx = i + 1
-    //   row.key = i.toString()
-    //   const addData = [...data, row]
-    //   this.data = addData
-    //   this.setCacheData(addData)
     },
     edit (key) {
       const newData = [...this.data]
@@ -193,7 +260,13 @@ export default {
       }
       this.editingKey = ''
     },
+    cancelEdit () {
+      this.cancel(this.editingKey)
+    },
     cancel (key) {
+      if (key === undefined || key == null || key.length <= 0) {
+        return
+      }
       const newData = [...this.data]
       const target = newData.filter(item => key === item.Id)[0]
       this.editingKey = ''
@@ -202,6 +275,26 @@ export default {
         delete target.editable
         this.data = newData
       }
+    },
+    getSkuDataList (customerId) {
+      this.$http
+        .post('/OrderAssistant/Customer/GetSkuList', {
+          CustomerId: customerId
+        })
+        .then(resJson => {
+          this.skuData = resJson.Data
+        })
+    },
+    filterOption (input, option) {
+      return (
+        option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
+    },
+    startDownload () {
+      this.loading = true
+    },
+    finishDownload () {
+      this.loading = false
     }
   }
 }

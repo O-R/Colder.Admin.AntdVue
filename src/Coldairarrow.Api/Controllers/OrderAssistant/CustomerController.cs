@@ -3,6 +3,7 @@ using Coldairarrow.Entity.OrderAssistant;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Coldairarrow.Api.Controllers.OrderAssistant
@@ -35,6 +36,28 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             return await _customerBus.GetTheDataAsync(input.id);
         }
 
+        [HttpPost]
+        public async Task<List<CustomerSkuDTO>> GetSkuList(CustomerSkuInputDTO input)
+        {
+            var result = new List<CustomerSkuDTO>();
+            if (string.IsNullOrEmpty(input?.CustomerId))
+            {
+                return result;
+            }
+            var list = await _customerBus.GetCustomerSkuList(input.CustomerId);
+
+            result.AddRange(list.Select(it => new CustomerSkuDTO()
+            {
+                CustomerId = it.CustomerId,
+                Id = it.SkuId,
+                Price = it.Price,
+                SkuName = it.Sku.SkuName,
+                SkuNo = it.Sku.SkuNo
+            }));
+
+            return result;
+
+        }
         #endregion
 
         #region 提交

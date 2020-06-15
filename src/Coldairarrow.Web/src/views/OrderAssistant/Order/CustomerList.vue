@@ -26,6 +26,7 @@ export default {
   data () {
     return {
       data: [],
+      customerId: '',
       pagination: {
         current: 1,
         pageSize: 10
@@ -34,7 +35,6 @@ export default {
       sorter: { field: 'Id', order: 'asc' },
       loading: false,
       queryParam: {},
-      customerId: '',
       form: this.$form.createForm(this),
       labelCol: { xs: { span: 24 }, sm: { span: 7 } },
       wrapperCol: { xs: { span: 24 }, sm: { span: 13 } }
@@ -66,6 +66,7 @@ export default {
     },
     handleChange (value) {
       this.customerId = value
+      this.$emit('changeCustomerId', this.customerId)
     },
     handleBlur () {
     //   console.log('blur');

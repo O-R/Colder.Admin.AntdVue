@@ -1,6 +1,6 @@
 <template>
   <div style="text-align: right">
-    <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" >
+    <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" :loading="loading" >
       新增行
     </a-button>
     <a-table :columns="columns" :data-source="data" :loading="loading" bordered>
