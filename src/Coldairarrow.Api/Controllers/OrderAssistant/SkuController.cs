@@ -43,6 +43,13 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
         [HttpPost]
         public async Task SaveData(Sku data)
         {
+            if (data?.SkuCustomers != null)
+            {
+                if (data.SkuCustomers.GroupBy(sc => sc.CustomerId).Any(gp => gp.Count() > 1))
+                {
+                    throw new BusException("存在同一客户配置了多条价格信息");
+                }
+            }
             if (data.Id.IsNullOrEmpty())
             {
                 InitEntity(data);

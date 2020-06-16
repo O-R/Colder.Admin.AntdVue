@@ -1,5 +1,8 @@
 <template>
   <div style="text-align: right">
+    <a-button type="primary" class="import-btn" @click="hanldleImport()" :loading="loading" >
+      导入Excel
+    </a-button>
     <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" :loading="loading" >
       新增行
     </a-button>
@@ -44,6 +47,8 @@
 </template>
 <script>
 
+import Excel from '@/utils/excel.js'
+// import XLSX from 'xlsx'
 import ImportForm from './ImportForm'
 
 const columns = [
@@ -148,6 +153,43 @@ export default {
     hanldleAdd () {
       this.$refs.importForm.openForm('新增')
     },
+    hanldleImport () {
+      // var a = [ {
+      //   name: '路人甲',
+      //   phone: '123456789',
+      //   email: '000@123456.com'
+      // },
+      // {
+      //   name: '炮灰乙',
+      //   phone: '123456789',
+      //   email: '000@123456.com'
+      // },
+      // {
+      //   name: '土匪丙',
+      //   phone: '123456789',
+      //   email: '000@123456.com'
+      // },
+      // {
+      //   name: '流氓丁',
+      //   phone: '123456789',
+      //   email: '000@123456.com'
+      // }
+      // ]
+      // Excel.exportExcel(a, '文件')
+
+      var that = this
+      Excel.importExcel((data, dataRef) => {
+        if (data.length < 2) {
+          that.$message.success('导入数据为空!')
+        } else {
+          data.map((d, idx) => {
+            if (idx > 0) {
+              that.add({ address: d[0], skus: d[1] })
+            }
+          })
+        }
+      })
+    },
     add (row) {
       const { data } = this
       var i = data.length > 0 ? data[data.length - 1].idx : 0
@@ -198,5 +240,9 @@ export default {
 }
 .editable-add-btn {
   margin-bottom: 8px
+}
+.import-btn {
+  margin-bottom: 8px;
+  margin-right: 20px;
 }
 </style>

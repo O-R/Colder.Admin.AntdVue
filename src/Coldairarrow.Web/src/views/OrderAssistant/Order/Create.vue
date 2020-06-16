@@ -87,7 +87,16 @@ export default {
         this.isNextClick = false
       } else if (this.current === 1) {
         this.loading = true
-        var parseData = this.$refs.importList.getParseData()
+
+        var parseData = []
+        try {
+          parseData = this.$refs.importList.getParseData()
+        } catch (error) {
+          this.$message.error('解析数据异常，请检查录入信息!')
+          this.loading = false
+          this.isNextClick = false
+          return
+        }
         if (parseData.length === 0) {
           this.$message.warn('请先录入信息!')
           this.loading = false
