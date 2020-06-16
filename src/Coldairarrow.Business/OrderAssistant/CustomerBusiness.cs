@@ -51,8 +51,10 @@ namespace Coldairarrow.Business.OrderAssistant
             await UpdateAsync(data);
         }
 
+        [Transactional(System.Data.IsolationLevel.RepeatableRead)]
         public async Task DeleteDataAsync(List<string> ids)
         {
+            await Service.DeleteAsync<CustomerSku>(cs => ids.Contains(cs.CustomerId));
             await DeleteAsync(ids);
         }
 
