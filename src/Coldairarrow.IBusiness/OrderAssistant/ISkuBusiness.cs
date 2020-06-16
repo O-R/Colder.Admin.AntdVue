@@ -14,6 +14,8 @@ namespace Coldairarrow.Business.OrderAssistant
         Task UpdateDataAsync(Sku data);
         Task DeleteDataAsync(List<string> ids);
 
+        Task SaveDataChangeAsync(Sku data, List<CustomerSku> addList, List<CustomerSku> updateList, List<CustomerSku> deleteList);
+
 
     }
 }

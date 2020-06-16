@@ -13,63 +13,69 @@
         :rules="rules"
         ref="form"
         v-bind="layout">
-        <a-form-model-item label="sku编号" prop="SkuNo">
-          <a-input v-model="entity.SkuNo" autocomplete="off" />
-        </a-form-model-item>
-        <a-form-model-item label="sku名称" prop="SkuName">
-          <a-input v-model="entity.SkuName" autocomplete="off" />
-        </a-form-model-item>
-        <a-form-model-item label="关键词" prop="KeyWords">
-          <a-textarea v-model="entity.KeyWords" placeholder="" :rows="4" autocomplete="off"/>
-        </a-form-model-item>
 
-        <a-form-model-item
-          v-for="(domain, index) in entity.domains"
-          :key="domain.key"
-          v-bind="index === 0 ? layout : formItemLayoutWithOutLabel"
-          :label="index === 0 ? '客户名' : ''"
-          :prop="'domains.' + index + '.CustomerId'"
-          :rules="{
-            required: true,
-            message: 'domain can not be null',
-            trigger: 'blur',
-          }"
-        >
-          <a-select
-            show-search
-            placeholder="请选择客户"
-            v-model="domain.CustomerId"
-            option-filter-prop="children"
-            :filter-option="filterOption"
-            style="width: 50%; margin-right: 10px"
+        <a-card title="基础信息" :bordered="false" class="card-tab">
+          <a-form-model-item label="sku编号" prop="SkuNo">
+            <a-input v-model="entity.SkuNo" autocomplete="off" />
+          </a-form-model-item>
+          <a-form-model-item label="sku名称" prop="SkuName">
+            <a-input v-model="entity.SkuName" autocomplete="off" />
+          </a-form-model-item>
+          <a-form-model-item label="关键词" prop="KeyWords">
+            <a-textarea v-model="entity.KeyWords" placeholder="" :rows="4" autocomplete="off"/>
+          </a-form-model-item>
+        </a-card>
+
+        <a-card title="价格信息" :bordered="false" class="card-tab" >
+          <a-form-model-item
+            v-for="(domain, index) in entity.SkuCustomers"
+            :key="domain.key"
+            v-bind="index === 0 ? layout : formItemLayoutWithOutLabel"
+            :label="index === 0 ? '客户名' : ''"
+            :prop="'SkuCustomers.' + index + '.CustomerId'"
+            :rules="{
+              required: true,
+              message: 'domain can not be null',
+              trigger: 'blur',
+            }"
           >
-            <a-select-option
-              v-for="(item, idx) in customerData"
-              :key="idx"
-              :value="item.Id">
-              {{ item.CustomerName }}
-            </a-select-option>
-          </a-select>
-          --
-          <a-input
-            v-model="domain.Price"
-            style="width: 30%; margin-left: 10px;margin-right: 5px"
-            placeholder="单价"
-          />
-          元
-          <a-icon
-            v-if="entity.domains.length > 1"
-            class="dynamic-delete-button"
-            type="minus-circle-o"
-            :disabled="entity.domains.length === 1"
-            @click="removeDomain(domain)"
-          />
-        </a-form-model-item>
-        <a-form-model-item v-bind="formItemLayoutWithOutLabel">
-          <a-button type="dashed" style="width: 40%" @click="addDomain">
-            <a-icon type="plus" /> 添加
-          </a-button>
-        </a-form-model-item>
+            <a-select
+              show-search
+              placeholder="请选择客户"
+              v-model="domain.CustomerId"
+              option-filter-prop="children"
+              :filter-option="filterOption"
+              style="width: 50%; margin-right: 10px"
+            >
+              <a-select-option
+                v-for="(item, idx) in customerData"
+                :key="idx"
+                :value="item.Id">
+                {{ item.CustomerName }}
+              </a-select-option>
+            </a-select>
+            --
+            <a-input
+              v-model="domain.Price"
+              style="width: 20%; margin-left: 10px;margin-right: 5px"
+              placeholder="单价"
+            />
+            元
+            <a-icon
+              v-if="entity.SkuCustomers.length >= 0"
+              class="dynamic-delete-button"
+              type="minus-circle-o"
+              :disabled="entity.SkuCustomers.length === 0"
+              @click="removeDomain(domain)"
+            />
+          </a-form-model-item>
+          <a-form-model-item v-bind="formItemLayoutWithOutLabel">
+            <a-button type="dashed" style="width: 40%" @click="addDomain">
+              <a-icon type="plus" /> 添加
+            </a-button>
+          </a-form-model-item>
+
+        </a-card>
       </a-form-model>
     </a-spin>
   </a-modal>
@@ -99,10 +105,8 @@ export default {
       visible: false,
       loading: false,
       entity: {
-        domains: [{
-          CustomerId: '',
-          key: Date.now(),
-          Price: 0
+        SkuCustomers: [{
+          key: Date.now()
         }]
       },
       rules: {},
@@ -113,7 +117,11 @@ export default {
   methods: {
     init () {
       this.visible = true
-      // this.entity = {}
+      this.entity = {
+        SkuCustomers: [{
+          key: Date.now()
+        }]
+      }
       this.$nextTick(() => {
         this.$refs['form'].clearValidate()
       })
@@ -151,14 +159,13 @@ export default {
       })
     },
     removeDomain (item) {
-      const index = this.entity.domains.indexOf(item)
+      const index = this.entity.SkuCustomers.indexOf(item)
       if (index !== -1) {
-        this.entity.domains.splice(index, 1)
+        this.entity.SkuCustomers.splice(index, 1)
       }
     },
     addDomain () {
-      this.entity.domains.push({
-        CustomerId: '',
+      this.entity.SkuCustomers.push({
         key: Date.now()
       })
     },
@@ -185,5 +192,8 @@ export default {
 .dynamic-delete-button[disabled] {
   cursor: not-allowed;
   opacity: 0.5;
+}
+.card-tab .ant-card-body {
+    padding: 24px 0px 0px 0px;
 }
 </style>

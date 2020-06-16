@@ -21,6 +21,7 @@ namespace Coldairarrow.Util
                 //日期类型默认格式化处理
                 setting.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
                 setting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 return setting;
             });
         }

@@ -3,6 +3,7 @@ using Coldairarrow.Entity.OrderAssistant;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Coldairarrow.Api.Controllers.OrderAssistant
@@ -46,16 +47,39 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             {
                 InitEntity(data);
 
-                data.SkuCustomers.ForEach(sc=> {
-                
-                    sc.id
-                })
+                data.SkuCustomers.ForEach(sc =>
+                {
+                    InitEntity(sc);
+                    sc.SkuId = data.Id;
+                });
 
                 await _skuBus.AddDataAsync(data);
             }
             else
             {
-                await _skuBus.UpdateDataAsync(data);
+                var dbCustomerSkus = (await _skuBus.GetSkuWithPriceAsync(data.Id)).SkuCustomers;
+
+                var addCustomerSkus = new List<CustomerSku>();
+                var deleteCustomerSkus = new List<CustomerSku>();
+                var updataCustomerSkus = new List<CustomerSku>();
+                data.SkuCustomers.ForEach(sc =>
+                {
+                    if (sc.Id.IsNullOrEmpty())
+                    {
+                        InitEntity(sc);
+                        sc.SkuId = data.Id;
+                        addCustomerSkus.Add(sc);
+                    }
+                    else
+                    {
+                        updataCustomerSkus.Add(sc);
+                    }
+                });
+
+                deleteCustomerSkus.AddRange(
+                    dbCustomerSkus.Where(ck => !data.SkuCustomers.Any(d => d.Id == ck.Id)));
+
+                await _skuBus.SaveDataChangeAsync(data, addCustomerSkus, updataCustomerSkus, deleteCustomerSkus);
             }
         }
 

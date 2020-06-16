@@ -56,6 +56,31 @@ namespace Coldairarrow.Business.OrderAssistant
             await DeleteAsync(ids);
         }
 
+        public async Task<Sku> GetSkuWithPriceAsync(string id)
+        {
+            return await Service.GetIQueryable<Sku>()
+                 .Include(sku => sku.SkuCustomers)
+                 .Where(sku => sku.Id == id).FirstOrDefaultAsync();
+        }
+
+        [Transactional(System.Data.IsolationLevel.RepeatableRead)]
+        public async Task SaveDataChangeAsync(Sku data, List<CustomerSku> addList, List<CustomerSku> updateList, List<CustomerSku> deleteList)
+        {
+            await UpdateDataAsync(data);
+            if (addList.Any())
+            {
+                await Service.InsertAsync(addList);
+            }
+            if (updateList.Any())
+            {
+                await Service.UpdateAsync(updateList);
+            }
+            if (deleteList.Any())
+            {
+                await Service.DeleteAsync(deleteList);
+            }
+        }
+
         #endregion
 
         #region 私有成员
