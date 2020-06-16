@@ -1,16 +1,9 @@
 <template>
   <div style="text-align: right">
 
-    <download-excel
-      :data="data"
-      :fields="excel_fields"
-      :before-generate="startDownload"
-      :before-finish="finishDownload"
-      name="订单.xls">
-      <a-button type="primary" class="editable-add-btn" :loading="loading" >
-        导出excel
-      </a-button>
-    </download-excel>
+    <a-button type="primary" class="editable-add-btn" :loading="loading" @click="exportExcel" >
+      导出excel
+    </a-button>
     <a-table :columns="columns" :data-source="data" :scroll="{ x: '200%' }" :loading="loading" bordered>
       <template
         v-for="col in ['Province','City','Area','Address','Receiver','ReceiverPhone','SkuNo','Count','Price']"
@@ -66,10 +59,7 @@
   </div>
 </template>
 <script>
-import Vue from 'vue'
-import JsonExcel from 'vue-json-excel'
-
-Vue.component('downloadExcel', JsonExcel)
+import Excel from '@/utils/excel.js'
 
 const columns = [
   {
@@ -155,20 +145,6 @@ const columns = [
     scopedSlots: { customRender: 'operation' }
   }
 ]
-const excelFields = {
-  '原始编号': 'OrderNo',
-  '生成时间': 'CreateTime',
-  '客户账号': 'CustomerNo',
-  '省': 'Province',
-  '市': 'City',
-  '区': 'Area',
-  '收货地址': 'Address',
-  '收货人姓名': 'Receiver',
-  '收货人手机': 'ReceiverPhone',
-  '商品编号/sku编号': 'SkuNo',
-  '数量': 'Count',
-  '单价': 'Price'
-}
 
 export default {
   props: {
@@ -186,7 +162,6 @@ export default {
     return {
       data: [],
       skuData: [],
-      excel_fields: excelFields,
       columns,
       editingKey: ''
     }
@@ -232,6 +207,23 @@ export default {
         target.Price = sku.Price
         this.data = newData
       }
+    },
+    exportExcel () {
+      const excelFields = {
+        '原始编号': 'OrderNo',
+        '生成时间': 'CreateTime',
+        '客户账号': 'CustomerNo',
+        '省': 'Province',
+        '市': 'City',
+        '区': 'Area',
+        '收货地址': 'Address',
+        '收货人姓名': 'Receiver',
+        '收货人手机': 'ReceiverPhone',
+        '商品编号/sku编号': 'SkuNo',
+        '数量': 'Count',
+        '单价': 'Price'
+      }
+      Excel.exportExcel(this.data, excelFields, '订单')
     },
     onDelete (key) {
       const dataSource = [...this.data]
@@ -291,12 +283,6 @@ export default {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
-    },
-    startDownload () {
-      this.loading = true
-    },
-    finishDownload () {
-      this.loading = false
     }
   }
 }

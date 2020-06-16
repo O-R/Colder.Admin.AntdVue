@@ -21,9 +21,38 @@
           <a-form-model-item label="sku名称" prop="SkuName">
             <a-input v-model="entity.SkuName" autocomplete="off" />
           </a-form-model-item>
-          <a-form-model-item label="关键词" prop="KeyWords">
-            <a-textarea v-model="entity.KeyWords" placeholder="" :rows="4" autocomplete="off"/>
+
+          <a-form-model-item
+            v-for="(keyword, index) in entity.SkuKeywords"
+            :key="keyword.key"
+            v-bind="index === 0 ? layout : formItemLayoutWithOutLabel"
+            :label="index === 0 ? '关键词' : ''"
+            :prop="'SkuKeywords.' + index + '.word'"
+            :rules="{
+              required: true,
+              message: '关键词必填',
+              trigger: 'blur',
+            }"
+          >
+            <a-input
+              v-model="keyword.word"
+              style="width: 70%;margin-right: 5px"
+              placeholder="关键词"
+            />
+            <a-icon
+              v-if="entity.SkuKeywords.length >= 0"
+              class="dynamic-delete-button"
+              type="minus-circle-o"
+              :disabled="entity.SkuKeywords.length === 0"
+              @click="removeKeyword(keyword)"
+            />
           </a-form-model-item>
+          <a-form-model-item v-bind="formItemLayoutWithOutLabel">
+            <a-button type="dashed" style="width: 40%" @click="addKeyword">
+              <a-icon type="plus" /> 添加
+            </a-button>
+          </a-form-model-item>
+
         </a-card>
 
         <a-card title="价格信息" :bordered="false" class="card-tab" >
@@ -107,6 +136,10 @@ export default {
       entity: {
         SkuCustomers: [{
           key: Date.now()
+        }],
+        SkuKeywords: [{
+          key: Date.now(),
+          word: ''
         }]
       },
       rules: {},
@@ -120,6 +153,10 @@ export default {
       this.entity = {
         SkuCustomers: [{
           key: Date.now()
+        }],
+        SkuKeywords: [{
+          key: Date.now(),
+          word: ''
         }]
       }
       this.$nextTick(() => {
@@ -134,6 +171,14 @@ export default {
         this.loading = true
         this.$http.post('/OrderAssistant/Sku/GetTheData', { id: id }).then(resJson => {
           this.loading = false
+          if (resJson.Data.KeywordList.length > 0) {
+            resJson.Data.SkuKeywords = resJson.Data.KeywordList.map((k, idx) => { return { key: Date.now() + '' + idx, word: k } })
+          }
+          if (resJson.Data.SkuCustomers.length > 0) {
+            resJson.Data.SkuCustomers.forEach(function (k, index, arr) {
+              k.key = k.Id
+            })
+          }
           Object.assign(this.entity, resJson.Data)
         })
       }
@@ -144,6 +189,7 @@ export default {
           return
         }
         this.loading = true
+        this.entity.KeyWords = this.entity.SkuKeywords.map(k => k.word).toString()
         this.$http.post('/OrderAssistant/Sku/SaveData', this.entity).then(resJson => {
           this.loading = false
 
@@ -156,6 +202,18 @@ export default {
             this.$message.error(resJson.Msg)
           }
         })
+      })
+    },
+    removeKeyword (item) {
+      const index = this.entity.SkuKeywords.indexOf(item)
+      if (index !== -1) {
+        this.entity.SkuKeywords.splice(index, 1)
+      }
+    },
+    addKeyword () {
+      this.entity.SkuKeywords.push({
+        key: Date.now(),
+        word: ''
       })
     },
     removeDomain (item) {

@@ -61,7 +61,7 @@ namespace Coldairarrow.Entity.OrderAssistant
         public List<CustomerSku> SkuCustomers { get; set; } = new List<CustomerSku>();
 
         [NotMapped]
-        public List<string> KeyworkList
+        public List<string> KeywordList
         {
             get
             {

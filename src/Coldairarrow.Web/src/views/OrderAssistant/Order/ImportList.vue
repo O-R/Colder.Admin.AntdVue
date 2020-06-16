@@ -1,5 +1,8 @@
 <template>
   <div style="text-align: right">
+    <a-button type="primary" class="import-btn" @click="hanldeDownloadTemplate()" :loading="loading" >
+      模板下载
+    </a-button>
     <a-button type="primary" class="import-btn" @click="hanldleImport()" :loading="loading" >
       导入Excel
     </a-button>
@@ -153,30 +156,14 @@ export default {
     hanldleAdd () {
       this.$refs.importForm.openForm('新增')
     },
+    hanldeDownloadTemplate () {
+      const excelFields = {
+        '地址': 'address',
+        '型号': 'skus'
+      }
+      Excel.exportExcel([], excelFields, '订单录入信息模板')
+    },
     hanldleImport () {
-      // var a = [ {
-      //   name: '路人甲',
-      //   phone: '123456789',
-      //   email: '000@123456.com'
-      // },
-      // {
-      //   name: '炮灰乙',
-      //   phone: '123456789',
-      //   email: '000@123456.com'
-      // },
-      // {
-      //   name: '土匪丙',
-      //   phone: '123456789',
-      //   email: '000@123456.com'
-      // },
-      // {
-      //   name: '流氓丁',
-      //   phone: '123456789',
-      //   email: '000@123456.com'
-      // }
-      // ]
-      // Excel.exportExcel(a, '文件')
-
       var that = this
       Excel.importExcel((data, dataRef) => {
         if (data.length < 2) {

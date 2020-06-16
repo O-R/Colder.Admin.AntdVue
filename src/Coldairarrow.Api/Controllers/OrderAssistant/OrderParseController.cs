@@ -72,16 +72,16 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                       var key = group.Key;
 
                       var result = customerSkuList.Where(cs =>
-                            cs.Sku.KeyworkList.Any(kw => kw.Contains(key))
+                            cs.Sku.KeywordList.Any(kw => kw.Contains(key))
                         ).Select(cs =>
                         {
                             var score = 0;
                             var seed = 10000;
-                            var keywords = cs.Sku.KeyworkList.Where(kw => kw.Contains(key)).ToList();
+                            var keywords = cs.Sku.KeywordList.Where(kw => kw.Contains(key)).ToList();
 
                             // 百分百命中 权重 10000
                             // 命中部分字符串 权重= key.length * 10000 / keyword.length * keyword.count
-                            foreach (var kw in cs.Sku.KeyworkList)
+                            foreach (var kw in cs.Sku.KeywordList)
                             {
                                 if (kw == key)
                                 {
@@ -89,7 +89,7 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                                 }
                                 else
                                 {
-                                    score += (key.Length * 10000) / (kw.Length * cs.Sku.KeyworkList.Count());
+                                    score += (key.Length * 10000) / (kw.Length * cs.Sku.KeywordList.Count());
                                 }
                             }
                             return new

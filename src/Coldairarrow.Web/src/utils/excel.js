@@ -3,32 +3,32 @@ import XLSX from 'xlsx'
 
 /**
  * @description:
- * @param {Object} json 服务端发过来的数据
+ * @param {Object} rows 服务端发过来的数据
  * @param {String} name 导出Excel文件名字
  * @return:
  */
-function exportExcel (json, name) {
+function exportExcel (rows, excelFields, name) {
   /* convert state to workbook */
   var data = []
-  var keyArray = []
 
-  for (const key1 in json) {
-    if (json.hasOwnProperty(key1)) {
-      const element = json[key1]
-      var rowDataArray = []
-      for (const key2 in element) {
-        if (element.hasOwnProperty(key2)) {
-          const element2 = element[key2]
-          rowDataArray.push(element2)
-          if (keyArray.length < getLength(element)) {
-            keyArray.push(key2)
-          }
-        }
-      }
-      data.push(rowDataArray)
+  var colNameArr = []
+  for (const key in excelFields) {
+    if (excelFields.hasOwnProperty(key)) {
+      colNameArr.push(key)
     }
   }
-  data.splice(0, 0, keyArray)
+  rows.forEach(function (row, i) {
+    const colValArr = []
+    colNameArr.forEach(function (col, i) {
+      const filed = excelFields[col]
+      if (row.hasOwnProperty(filed)) {
+        colValArr.push(row[filed])
+      }
+    })
+    data.push(colValArr)
+  })
+
+  data.splice(0, 0, colNameArr)
   const ws = XLSX.utils.aoa_to_sheet(data)
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'SheetJS')
@@ -91,22 +91,6 @@ function _file (file, callback) {
     callback(data, makeCols(ws['!ref']))
   }
   reader.readAsBinaryString(file)
-}
-
-/**
- * @description: 获取map的长度
- * @param {Object} obj map对象
- * @return: map的长度
- */
-function getLength (obj) {
-  var count = 0
-  for (var i in obj) {
-    if (obj.hasOwnProperty(i)) {
-      count++
-    }
-  }
-
-  return count
 }
 
 export default {

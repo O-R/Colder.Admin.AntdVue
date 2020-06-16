@@ -136,7 +136,7 @@ export default {
 
             if (resJson.Success) {
               if (resJson.Data === undefined || resJson.Data == null || resJson.Data.length === 0) {
-                this.$message.error('解析失败')
+                this.$message.error('解析失败，找不到相关商品信息')
               } else {
                 this.current++
                 this.$nextTick(() => {
