@@ -191,6 +191,7 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                 throw new BusException("没有可保存的数据");
             }
 
+            //todo 客户id ，sku id合法性校验
 
             //var orderItemIds = list.Select(li => li.Id).ToList();
             //var existsItemIds = await _orderBus.GetExistsIdsAsync(orderItemIds);

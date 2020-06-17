@@ -199,6 +199,15 @@ export default {
       const newData = [...this.data]
       const newCacheData = [...this.cacheData]
       const target = newData.filter(item => key === item.key)[0]
+      if (this.trim(target.address) === '') {
+        this.$message.warn('地址必填')
+        return
+      }
+
+      if (this.trim(target.skus) === '') {
+        this.$message.warn('型号必填')
+        return
+      }
       const targetCache = newCacheData.filter(item => key === item.key)[0]
       if (target && targetCache) {
         delete target.editable
@@ -207,6 +216,9 @@ export default {
         this.cacheData = newCacheData
       }
       this.editingKey = ''
+    },
+    trim (str) {
+      return str.replace(/(^\s*)|(\s*$)/g, '')
     },
     cancel (key) {
       const newData = [...this.data]

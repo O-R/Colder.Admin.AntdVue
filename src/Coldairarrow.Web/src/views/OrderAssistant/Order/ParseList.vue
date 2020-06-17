@@ -111,7 +111,7 @@ const columns = [
     title: '收货人姓名',
     width: '10%',
     dataIndex: 'Receiver',
-    scopedSlots: { customRender: 'ReceiverName' }
+    scopedSlots: { customRender: 'Receiver' }
   },
   {
     title: '收货人手机',
@@ -155,6 +155,12 @@ export default {
   },
   mounted () {
     this.getSkuDataList()
+  },
+  computed: {
+    vmdl: function (row, col) {
+      return row[col]
+    }
+
   },
   data () {
     // const data = this.orders
@@ -206,6 +212,7 @@ export default {
         target.SkuName = sku.SkuName
         target.Price = sku.Price
         this.data = newData
+        // Object.assign(this.data, newData)
       }
     },
     exportExcel () {

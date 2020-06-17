@@ -73,13 +73,19 @@ export default {
       return this.loading && this.isNextClick && this.current === 1
     }
   },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+    // 通过 `vm` 访问组件实例
+      vm.$refs.customerList.getDataList()
+    })
+  },
   methods: {
     next () {
       this.isNextClick = true
       var customerId = this.$store.state.app.selectedCustomerId
       if (this.current === 0) {
         // var customerId = this.$refs.customerList.getCustomerId()
-        if (customerId === '' || customerId == undefined || customerId == null) {
+        if (customerId === '' || customerId === undefined || customerId == null) {
           this.$message.warn('请先选择客户!')
         } else {
           this.current++

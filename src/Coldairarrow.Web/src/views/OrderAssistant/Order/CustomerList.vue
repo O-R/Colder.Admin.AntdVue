@@ -20,9 +20,9 @@
 </template>
 <script>
 export default {
-  mounted () {
-    this.getDataList()
-  },
+  // mounted () {
+  //   this.getDataList()
+  // },
 
   // :defaultValue="selectedCustomerName"
   // computed: {
@@ -52,6 +52,7 @@ export default {
       this.selectedRowKeys = []
 
       this.loading = true
+      var that = this
       this.$http
         .post('/OrderAssistant/Customer/GetDataList', {
           PageIndex: this.pagination.current,
@@ -61,11 +62,11 @@ export default {
           ...this.filters
         })
         .then(resJson => {
-          this.loading = false
-          this.data = resJson.Data
-          const pagination = { ...this.pagination }
+          that.loading = false
+          that.data = resJson.Data
+          const pagination = { ...that.pagination }
           pagination.total = resJson.Total
-          this.pagination = pagination
+          that.pagination = pagination
         })
     },
     // getCustomerId () {
