@@ -34,7 +34,12 @@ export default {
       visible: false,
       loading: false,
       entity: {},
-      rules: {},
+      rules: {
+        address: [
+          { required: true, message: '地址必填', trigger: 'blur' }
+        ],
+        skus: [{ required: true, message: '型号必填', trigger: 'blur' }]
+      },
       title: ''
     }
   },

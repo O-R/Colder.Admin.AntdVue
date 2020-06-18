@@ -55,7 +55,7 @@
 
         </a-card>
 
-        <a-card title="价格信息" :bordered="false" class="card-tab" >
+        <a-card title="定价信息" :bordered="false" class="card-tab" >
           <a-form-model-item
             v-for="(domain, index) in entity.SkuCustomers"
             :key="domain.key"
@@ -63,9 +63,8 @@
             :label="index === 0 ? '客户名' : ''"
             :prop="'SkuCustomers.' + index + '.CustomerId'"
             :rules="{
-              required: true,
-              message: 'domain can not be null',
-              trigger: 'blur',
+              validator: validateCustomerPrice,
+              trigger: ['change','blur'],
             }"
           >
             <a-select
@@ -142,7 +141,12 @@ export default {
           word: ''
         }]
       },
-      rules: {},
+      rules: {
+        SkuNo: [
+          { required: true, message: 'sku编号必填', trigger: 'blur' }
+        ],
+        SkuName: [{ required: true, message: 'sku名称必填', trigger: 'blur' }]
+      },
       title: ''
 
     }
@@ -163,6 +167,9 @@ export default {
         this.$refs['form'].clearValidate()
       })
     },
+    // data () {
+
+    // },
     openForm (id, title) {
       this.title = title
       this.init()
@@ -231,7 +238,21 @@ export default {
       return (
         option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
       )
+    },
+    validateCustomerPrice (rule, value, callback) {
+      if (value === '') {
+        callback(new Error('请选择客户'))
+      } else {
+        var priceInfo = this.entity.SkuCustomers.find(sc => sc.CustomerId === value)
+        if (priceInfo === undefined) {
+          callback(new Error('客户被删除，请重新选择'))
+        } else if (priceInfo.Price === '') {
+          callback(new Error('单价必填'))
+        }
+      }
+      callback()
     }
+
   }
 }
 </script>

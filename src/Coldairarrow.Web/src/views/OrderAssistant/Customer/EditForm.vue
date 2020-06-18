@@ -34,7 +34,12 @@ export default {
       visible: false,
       loading: false,
       entity: {},
-      rules: {},
+      rules: {
+        CustomerNo: [
+          { required: true, message: '客户编号必填', trigger: 'blur' }
+        ],
+        CustomerName: [{ required: true, message: '客户名称必填', trigger: 'blur' }]
+      },
       title: ''
     }
   },
