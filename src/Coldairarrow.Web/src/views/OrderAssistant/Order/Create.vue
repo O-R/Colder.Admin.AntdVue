@@ -23,10 +23,18 @@
           @click="save"
           :loading="isSaveLoading"
         >
-          保存
+          保存&关闭
         </a-button>
       </div>
     </div>
+    <a-modal v-model="visible" title="拆词结果" on-ok="handleSaveValidate">
+      <template slot="footer">
+        <a-button key="beforeSave" type="primary" @click="handleSaveValidate">
+          我知道了
+        </a-button>
+      </template>
+      <p>存在 {{ ErrorRowCount }} 条异常数据，请先修改后再保存</p>
+    </a-modal>
   </a-card>
 </template>
 <script>
@@ -46,6 +54,8 @@ export default {
       isNextClick: false,
       isSaveClick: false,
       current: 0,
+      ErrorRowCount: 0,
+      visible: false,
       steps: [
         {
           title: '请选择下单客户',
@@ -108,32 +118,10 @@ export default {
           this.loading = false
           this.isNextClick = false
         } else {
-          const defaultItem = {
-            index: 0,
-            province: '',
-            provinceCode: '',
-            city: '',
-            cityCode: '',
-            county: '',
-            countyCode: '',
-            street: '',
-            streetCode: '',
-            address: '',
-            name: '',
-            phone: '',
-            skuKeyWords: '',
-            fullAddress: ''
-          }
-          const list = parseData.map(item => {
-            const dItem = { ...defaultItem }
-            Object.assign(dItem, item)
-            return dItem
-          })
-
           const postData = {
             // CustomerId: this.$refs.customerList.getCustomerId(),
             CustomerId: customerId,
-            Orders: list
+            Orders: parseData
           }
 
           this.$http.post('/OrderAssistant/Order/Parse', postData).then(resJson => {
@@ -170,6 +158,10 @@ export default {
         this.current--
       }
     },
+    handleSaveValidate () {
+      this.visible = false
+      this.ErrorRowCount = 0
+    },
     save () {
       var orderParseList = this.$refs.parseList.getData()
 
@@ -178,14 +170,28 @@ export default {
         return
       }
 
-      this.isSaveClick = true
-      this.$http.post('/OrderAssistant/Order/SaveList', orderParseList).then(resJson => {
-        this.loading = false
-        this.isSaveClick = false
+      this.ErrorRowCount = orderParseList.reduce(function (sum, item) {
+        return sum + (item.IsError ? 1 : 0)
+      }, 0)
 
+      if (this.ErrorRowCount > 0) {
+        this.visible = true
+        return
+      }
+
+      this.isSaveClick = true
+      this.loading = true
+      this.$http.post('/OrderAssistant/Order/SaveList', orderParseList).then(resJson => {
         if (resJson.Success) {
-          this.$message.success('保存成功')
+          var that = this
+          this.$message.success('保存成功', 1, function () {
+            that.loading = false
+            that.isSaveClick = false
+            that.current = 0
+          })
         } else {
+          this.loading = false
+          this.isSaveClick = false
           this.$message.error(resJson.Msg)
         }
       })

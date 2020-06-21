@@ -13,6 +13,12 @@ namespace Order.Assistant.CodeFirst
                : base(options)
         {
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Data.Entity.Order>().HasIndex(ord => ord.CustomerId);
+            modelBuilder.Entity<Data.Entity.OrderItem>().HasIndex(ordIt => ordIt.SkuId);
+        }
 
         /// <summary>
         /// 客户表

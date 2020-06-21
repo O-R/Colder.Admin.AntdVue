@@ -9,7 +9,7 @@
     <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" :loading="loading" >
       新增行
     </a-button>
-    <a-table :columns="columns" :data-source="data" :loading="loading" bordered>
+    <a-table :columns="columns" :data-source="data" :loading="loading" :pagination="pagination" bordered>
       <template
         v-for="col in ['address','skus']"
         :slot="col"
@@ -80,32 +80,7 @@ const columns = [
   }
 ]
 
-const data = [
-  {
-    idx: 1,
-    key: 0,
-    address: '汪银仙 15068158215 浙江省杭州市富阳区富春街道迎宾路2号家电市场26号摊位(请打电话) ',
-    skus: 'v5木纹色➕大棉垫➕凉垫坐垫➕杯架➕黑色挂篮➕熊猫枕。'
-  },
-  {
-    idx: 2,
-    key: 1,
-    address: '周潇潇     15869188265，浙江省杭州市拱墅区半山街道宋都香悦郡5-2-2204',
-    skus: 'v5木纹色➕ 大棉垫➕凉垫坐垫➕底篮➕杯架➕熊猫枕头➕黑色挂篮'
-  },
-  {
-    idx: 3,
-    key: 2,
-    address: '况爱香 18279599695 江西省宜春市上高县敖阳街道上高县锦江镇建设中路24号杭州棉绸店',
-    skus: 'V3蓝色款，黑色坐垫，黑色挂篮，黑黑黑色伞，枕头'
-  },
-  {
-    idx: 4,
-    key: 3,
-    address: '江西省吉安市吉州区禾埠街道柏树下儿童医院住院部四楼护士站 黄丽青 18279646521',
-    skus: 'V5-B 红黑色，底篮'
-  }
-]
+const data = []
 
 export default {
   components: {
@@ -122,7 +97,13 @@ export default {
     return {
       data,
       columns,
-      editingKey: ''
+      editingKey: '',
+      pagination: {
+        current: 1,
+        pageSize: 20,
+        showTotal: (total, range) => `总数:${total} 当前:${range[0]}-${range[1]}`,
+        showSizeChanger: true
+      }
     }
   },
   methods: {
@@ -139,11 +120,44 @@ export default {
     },
     getParseData () {
       var that = this
+      const defaultItem = {
+        index: 0,
+        province: '',
+        provinceCode: '',
+        city: '',
+        cityCode: '',
+        county: '',
+        countyCode: '',
+        street: '',
+        streetCode: '',
+        address: '',
+        name: '',
+        phone: '',
+        skuKeyWords: '',
+        fullAddress: '',
+        isError: false,
+        errorMessage: ''
+      }
       return this.data.map(item => {
-        var addr = that.smartParse(item.address)
+        var addr = {}
+        try {
+          addr = that.smartParse(item.address)
+        } catch (error) {
+          addr = Object.assign(addr, defaultItem)
+          addr.isError = true
+          addr.address = item.address
+          addr.errorMessage = '地址解析异常'
+        }
         addr.skuKeyWords = item.skus
         addr.fullAddress = item.address
         addr.index = item.key
+
+        if (!addr.isError && (!addr.province || !addr.city || !addr.county || !addr.address || !addr.name || !addr.phone)) {
+          addr.isError = true
+          addr.address = item.address
+          addr.errorMessage = '地址解析异常'
+        }
+
         return addr
       })
     },
@@ -199,12 +213,12 @@ export default {
       const newData = [...this.data]
       const newCacheData = [...this.cacheData]
       const target = newData.filter(item => key === item.key)[0]
-      if (this.trim(target.address) === '') {
+      if (target.address.toString().trim() === '') {
         this.$message.warn('地址必填')
         return
       }
 
-      if (this.trim(target.skus) === '') {
+      if (target.skus.toString().trim() === '') {
         this.$message.warn('型号必填')
         return
       }
@@ -216,9 +230,6 @@ export default {
         this.cacheData = newCacheData
       }
       this.editingKey = ''
-    },
-    trim (str) {
-      return str.replace(/(^\s*)|(\s*$)/g, '')
     },
     cancel (key) {
       const newData = [...this.data]

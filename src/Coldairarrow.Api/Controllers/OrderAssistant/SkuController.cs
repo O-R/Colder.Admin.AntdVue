@@ -96,6 +96,20 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             await _skuBus.DeleteDataAsync(ids);
         }
 
+        [HttpPost]
+        public async Task Import(List<Sku> list)
+        {
+            if (list == null || !list.Any())
+            {
+                throw new BusException("导入数据为空");
+            }
+            list.ForEach(it =>
+            {
+                InitEntity(it);
+            });
+            await _skuBus.AddDataListAsync(list);
+        }
+
         #endregion
     }
 }

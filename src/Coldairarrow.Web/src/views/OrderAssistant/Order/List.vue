@@ -106,7 +106,7 @@ export default {
       data: [],
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: 20,
         showTotal: (total, range) => `总数:${total} 当前:${range[0]}-${range[1]}`
       },
       filters: {},

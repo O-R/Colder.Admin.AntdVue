@@ -23,6 +23,8 @@ function exportExcel (rows, excelFields, name) {
       const filed = excelFields[col]
       if (row.hasOwnProperty(filed)) {
         colValArr.push(row[filed])
+      } else {
+        colValArr.push('')
       }
     })
     data.push(colValArr)

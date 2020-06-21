@@ -67,5 +67,17 @@ namespace Coldairarrow.Entity.OrderAssistant
         /// </summary>
         public Int32 Count { get; set; }
 
+        /// <summary>
+        /// 是否解析失败
+        /// </summary>
+        [NotMapped]
+        public bool IsError { get; set; }
+
+        /// <summary>
+        /// 解析失败原因
+        /// </summary>
+        [NotMapped]
+        public string ErrorMessage { get; set; }
+
     }
 }

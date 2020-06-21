@@ -34,12 +34,6 @@ namespace Order.Assistant.CodeFirst.Data.Entity
         public string CustomerId { get; set; }
 
         /// <summary>
-        /// 所属客户
-        /// </summary>
-        [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; }
-
-        /// <summary>
         /// 省编号
         /// </summary>
         [StringLength(50)]

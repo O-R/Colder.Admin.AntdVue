@@ -9,6 +9,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Extensions;
+using Microsoft.Extensions.Options;
+using Coldairarrow.Api.Configs;
 
 namespace Coldairarrow.Api.Controllers.OrderAssistant
 {
@@ -17,14 +19,18 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
     {
         #region DI
 
-        public OrderParseController(IOrderBusiness orderBus, ICustomerBusiness customerBus)
+        public OrderParseController(IOrderBusiness orderBus, ICustomerBusiness customerBus, IOptions<Seperator> seperatorOptions)
         {
             _orderBus = orderBus;
             _customerBus = customerBus;
+
+            _seperator = seperatorOptions.Value;
         }
 
         IOrderBusiness _orderBus { get; }
         ICustomerBusiness _customerBus { get; }
+
+        Seperator _seperator { get; }
 
         #endregion
 
@@ -65,54 +71,70 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                 var id = IdHelper.GetId();
                 var orderItems = new List<OrderItem>();
 
-                var skuKeys = item.skuKeyWords.Split(new char[] { '+', '➕' }, StringSplitOptions.RemoveEmptyEntries).Select(sk => sk.Trim()).ToList();
+                //分割出 关键词*数量 的数组
+                var wordNCountStringArray = item.skuKeyWords.Split(_seperator.SkuKeySeperatorArray, StringSplitOptions.RemoveEmptyEntries).Select(sk => sk.Trim()).ToList();
 
-                skuKeys.GroupBy(key => key).ForEach(group =>
+                var wordCountDic = new Dictionary<string, int>();
+
+                wordNCountStringArray.ForEach(str =>
+                {
+                    //关键词  数量
+                    var wordNCount = str.Split(_seperator.SkuCountSeperatorArray, StringSplitOptions.RemoveEmptyEntries).Select(it => it.Trim()).ToList();
+
+                    var word = wordNCount[0];
+                    var count = wordNCount.Count > 1 ? wordNCount[1].ToInt() : 0;
+                    count = count == 0 ? 1 : count;
+                    if (wordCountDic.ContainsKey(word))
+                    {
+                        wordCountDic[word] = wordCountDic[word] + count;
+                    }
+                    else
+                    {
+                        wordCountDic.Add(word, count);
+                    }
+
+                });
+                wordCountDic.ForEach(keyNcount =>
                   {
-                      var key = group.Key;
+                      var key = keyNcount.Key;
 
-                      var result = customerSkuList.Where(cs =>
-                            cs.Sku.KeywordList.Any(kw => kw.Contains(key))
-                        ).Select(cs =>
-                        {
-                            var score = 0;
-                            var seed = 10000;
-                            var keywords = cs.Sku.KeywordList.Where(kw => kw.Contains(key)).ToList();
+                      var findSku = customerSkuList.Where(cs => cs.Sku.KeywordList.Any(kw => kw.Trim() == key))
+                            .OrderBy(cs => cs.SkuId).FirstOrDefault();
 
-                            // 百分百命中 权重 10000
-                            // 命中部分字符串 权重= key.length * 10000 / keyword.length * keyword.count
-                            foreach (var kw in cs.Sku.KeywordList)
-                            {
-                                if (kw == key)
-                                {
-                                    score += seed;
-                                }
-                                else
-                                {
-                                    score += (key.Length * 10000) / (kw.Length * cs.Sku.KeywordList.Count());
-                                }
-                            }
-                            return new
-                            {
-                                Score = score,
-                                Sku = cs.Sku,
-                                Count = group.Count(),
-                                Price = cs.Price
-
-                            };
-                        }).OrderByDescending(sku => sku.Score).OrderBy(sku => sku.Sku.Id).ToList();
-
-                      orderItems.AddRange(result.Select(rs => new OrderItem()
+                      if (findSku == null)
                       {
-                          Id = IdHelper.GetId(),
-                          Count = rs.Count,
-                          OrderId = id,
-                          Price = rs.Price,
-                          SkuId = rs.Sku.Id,
-                          SkuName = rs.Sku.SkuName,
-                          SkuNo = rs.Sku.SkuNo
-                      }));
+                          orderItems.Add(new OrderItem()
+                          {
+                              Id = IdHelper.GetId(),
+                              Count = keyNcount.Value,
+                              OrderId = id,
+                              Price = 0,
+                              SkuId = string.Empty,
+                              SkuName = item.skuKeyWords,
+                              SkuNo = string.Empty,
+                              IsError = true,
+                              ErrorMessage = $"客户{customer.CustomerName},匹配不到关键词{key};" + item.errorMessage
+                          });
+                      }
+                      else
+                      {
+                          var isError = item.isError || keyNcount.Value <= 0;
+                          var errorMessage = keyNcount.Value <= 0 ? "商品数量解析异常;" : string.Empty;
+                          errorMessage += item.isError ? item.errorMessage : string.Empty;
+                          orderItems.Add(new OrderItem()
+                          {
+                              Id = IdHelper.GetId(),
+                              Count = keyNcount.Value,
+                              OrderId = id,
+                              Price = findSku.Price,
+                              SkuId = findSku.Id,
+                              SkuName = findSku.Sku.SkuName,
+                              SkuNo = findSku.Sku.SkuNo,
 
+                              IsError = isError,
+                              ErrorMessage = errorMessage
+                          });
+                      }
                   });
 
                 var order = new Order()
@@ -166,7 +188,9 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
                         SkuId = item.SkuId,
                         OrderId = ord.Id,
                         CustomerId = customer.Id,
-                        TotalPrice = ord.TotalPrice
+                        TotalPrice = ord.TotalPrice,
+                        IsError = item.IsError,
+                        ErrorMessage = item.ErrorMessage
                     });
                 }
 

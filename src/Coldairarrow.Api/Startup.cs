@@ -1,4 +1,5 @@
-﻿using Coldairarrow.Util;
+﻿using Coldairarrow.Api.Configs;
+using Coldairarrow.Util;
 using EFCore.Sharding;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -23,6 +24,8 @@ namespace Coldairarrow.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<Seperator>(Configuration.GetSection(Seperator.Section));
+
             services.AddFxServices();
             services.AddAutoMapper();
             services.UseEFCoreSharding(config =>

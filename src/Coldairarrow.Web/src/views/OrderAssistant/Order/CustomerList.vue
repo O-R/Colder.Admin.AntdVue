@@ -36,7 +36,7 @@ export default {
       customerId: '',
       pagination: {
         current: 1,
-        pageSize: 10
+        pageSize: 20
       },
       filters: {},
       sorter: { field: 'Id', order: 'asc' },

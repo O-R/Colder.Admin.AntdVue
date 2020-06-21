@@ -11,6 +11,7 @@ namespace Coldairarrow.Business.OrderAssistant
         Task<Sku> GetTheDataAsync(string id);
         Task<Sku> GetSkuWithPriceAsync(string id);
         Task AddDataAsync(Sku data);
+        Task AddDataListAsync(List<Sku> list);
         Task UpdateDataAsync(Sku data);
         Task DeleteDataAsync(List<string> ids);
 

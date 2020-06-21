@@ -83,6 +83,11 @@ namespace Coldairarrow.Business.OrderAssistant
             }
         }
 
+        public async Task AddDataListAsync(List<Sku> list)
+        {
+            await Service.InsertAsync(list);
+        }
+
         #endregion
 
         #region 私有成员

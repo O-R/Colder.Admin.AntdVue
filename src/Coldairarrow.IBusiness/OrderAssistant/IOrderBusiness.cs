@@ -54,6 +54,18 @@ namespace Coldairarrow.Business.OrderAssistant
         public string skuKeyWords { get; set; }
         public string fullAddress { get; set; }
 
+
+
+        /// <summary>
+        /// 是否解析失败
+        /// </summary>
+        public bool isError { get; set; }
+
+        /// <summary>
+        /// 解析失败原因
+        /// </summary>
+        public string errorMessage { get; set; }
+
         public List<Sku> Skus { get; set; }
 
     }
@@ -127,6 +139,17 @@ namespace Coldairarrow.Business.OrderAssistant
         public decimal Discount { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+
+        /// <summary>
+        /// 是否解析失败
+        /// </summary>
+        public bool IsError { get; set; }
+
+        /// <summary>
+        /// 解析失败原因
+        /// </summary>
+        public string ErrorMessage { get; set; }
 
 
     }

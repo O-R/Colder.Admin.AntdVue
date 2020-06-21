@@ -15,10 +15,10 @@
         v-bind="layout">
 
         <a-card title="基础信息" :bordered="false" class="card-tab">
-          <a-form-model-item label="sku编号" prop="SkuNo">
+          <a-form-model-item label="SKU编号" prop="SkuNo">
             <a-input v-model="entity.SkuNo" autocomplete="off" />
           </a-form-model-item>
-          <a-form-model-item label="sku名称" prop="SkuName">
+          <a-form-model-item label="SKU名称" prop="SkuName">
             <a-input v-model="entity.SkuName" autocomplete="off" />
           </a-form-model-item>
 
@@ -83,8 +83,10 @@
               </a-select-option>
             </a-select>
             --
-            <a-input
+            <a-input-number
               v-model="domain.Price"
+              :min="0"
+              :precision="2"
               style="width: 20%; margin-left: 10px;margin-right: 5px"
               placeholder="单价"
             />
@@ -133,6 +135,8 @@ export default {
       visible: false,
       loading: false,
       entity: {
+        SkuNo: '',
+        SkuName: '',
         SkuCustomers: [{
           key: Date.now()
         }],
@@ -143,9 +147,9 @@ export default {
       },
       rules: {
         SkuNo: [
-          { required: true, message: 'sku编号必填', trigger: 'blur' }
+          { required: true, message: 'SKU编号必填', trigger: 'blur' }
         ],
-        SkuName: [{ required: true, message: 'sku名称必填', trigger: 'blur' }]
+        SkuName: [{ required: true, message: 'SKU名称必填', trigger: 'blur' }]
       },
       title: ''
 
@@ -155,6 +159,8 @@ export default {
     init () {
       this.visible = true
       this.entity = {
+        SkuNo: '',
+        SkuName: '',
         SkuCustomers: [{
           key: Date.now()
         }],
@@ -186,6 +192,7 @@ export default {
               k.key = k.Id
             })
           }
+          // this.entity = resJson.Data
           Object.assign(this.entity, resJson.Data)
         })
       }
@@ -248,6 +255,10 @@ export default {
           callback(new Error('客户被删除，请重新选择'))
         } else if (priceInfo.Price === '') {
           callback(new Error('单价必填'))
+        } else {
+          if (!/^\d+(\.\d+)?$/.test(priceInfo.Price)) {
+            callback(new Error('单价必须是数字'))
+          }
         }
       }
       callback()

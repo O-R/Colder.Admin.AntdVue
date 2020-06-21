@@ -4,9 +4,16 @@
     <a-button type="primary" class="editable-add-btn" :loading="loading" @click="exportExcel" >
       导出excel
     </a-button>
-    <a-table :columns="columns" :data-source="data" :scroll="{ x: '200%' }" :loading="loading" bordered>
+    <a-table
+      :columns="columns"
+      :data-source="data"
+      :scroll="{ x: '200%' }"
+      :loading="loading"
+      :rowClassName="setRowClassName"
+      :pagination="pagination"
+      bordered >
       <template
-        v-for="col in ['Province','City','Area','Address','Receiver','ReceiverPhone','SkuNo','Count','Price']"
+        v-for="col in ['Province','City','Area','Address','Receiver','ReceiverPhone','SkuName','SkuNo','Count','Price']"
         :slot="col"
         slot-scope="text, record"
       >
@@ -28,6 +35,22 @@
               {{ item.SkuNo }}
             </a-select-option>
           </a-select>
+          <a-input-number
+            v-else-if="record.editable && col==='Count'"
+            v-model="record.Count"
+            style="margin: -5px 0"
+            :min="1"
+            :precision="0"
+            @change="num => handleChange(num, record.Id, col)"
+          />
+          <a-input-number
+            v-else-if="record.editable && col==='Price'"
+            v-model="record.Price"
+            style="margin: -5px 0"
+            :min="0"
+            :precision="2"
+            @change="num => handleChange(num, record.Id, col)"
+          />
           <a-input
             v-else-if="record.editable"
             style="margin: -5px 0"
@@ -43,6 +66,7 @@
         <div class="editable-row-operations">
           <span v-if="record.editable">
             <a @click="() => save(record.Id)">保存</a>
+            <a v-if="record.IsError" @click="() => saveAsSuccess(record.Id)">保存为正确数据</a>
             <a-popconfirm title="确定取消?" @confirm="() => cancel(record.Id)">
               <a>取消</a>
             </a-popconfirm>
@@ -56,6 +80,14 @@
         </div>
       </template>
     </a-table>
+    <a-modal v-model="visible" title="拆词结果" on-ok="handleKnowResult">
+      <template slot="footer">
+        <a-button key="back" type="primary" @click="handleKnowResult">
+          我知道了
+        </a-button>
+      </template>
+      <p>拆词完成，{{ SuccessRowCount }} 条数据成功，{{ ErrorRowCount }} 条数据失败</p>
+    </a-modal>
   </div>
 </template>
 <script>
@@ -63,7 +95,7 @@ import Excel from '@/utils/excel.js'
 
 const columns = [
   {
-    title: '原始编号',
+    title: '原始订单编号',
     dataIndex: 'OrderNo',
     width: '10%',
     // fixed: 'left',
@@ -120,7 +152,13 @@ const columns = [
     scopedSlots: { customRender: 'ReceiverPhone' }
   },
   {
-    title: '商品编号/sku编号',
+    title: '商品名称',
+    width: '20%',
+    dataIndex: 'SkuName',
+    scopedSlots: { customRender: 'SkuName' }
+  },
+  {
+    title: '商品编号/SKU编号',
     width: '20%',
     dataIndex: 'SkuNo',
     scopedSlots: { customRender: 'SkuNo' }
@@ -156,12 +194,6 @@ export default {
   mounted () {
     this.getSkuDataList()
   },
-  computed: {
-    vmdl: function (row, col) {
-      return row[col]
-    }
-
-  },
   data () {
     // const data = this.orders
     // this.setCacheData(data)
@@ -169,7 +201,17 @@ export default {
       data: [],
       skuData: [],
       columns,
-      editingKey: ''
+      editingKey: '',
+      SuccessRowCount: 0,
+      ErrorRowCount: 0,
+      visible: false,
+      pagination: {
+        current: 1,
+        pageSize: 40,
+        showTotal: (total, range) => `总数:${total} 当前:${range[0]}-${range[1]}`,
+        showSizeChanger: true,
+        pageSizeOptions: ['20', '40', '60', '80', '100']
+      }
     }
   },
   computed: {
@@ -186,12 +228,25 @@ export default {
     setData (d) {
       this.data = d
       this.setCacheData(d)
+
+      this.ErrorRowCount = this.data.reduce(function (sum, item) {
+        return sum + (item.IsError ? 1 : 0)
+      }, 0)
+
+      this.SuccessRowCount = this.data.length - this.ErrorRowCount
+      this.visible = true
     },
     getData () {
       return this.data
     },
     setCacheData (d) {
       this.cacheData = d.map(item => ({ ...item }))
+    },
+    setRowClassName (record, index) {
+      return record.IsError ? 'errorRow-highlight' : ''
+    },
+    handleKnowResult () {
+      this.visible = false
     },
     handleChange (value, key, column) {
       const newData = [...this.data]
@@ -217,18 +272,41 @@ export default {
     },
     exportExcel () {
       const excelFields = {
-        '原始编号': 'OrderNo',
+        '原始订单编号': 'OrderNo',
         '生成时间': 'CreateTime',
-        '客户账号': 'CustomerNo',
+        '买家账号': 'CustomerNo',
+        '国家': '',
         '省': 'Province',
         '市': 'City',
         '区': 'Area',
         '收货地址': 'Address',
-        '收货人姓名': 'Receiver',
-        '收货人手机': 'ReceiverPhone',
-        '商品编号/sku编号': 'SkuNo',
+        '买家姓名': 'Receiver',
+        '买家电话': '',
+        '买家手机': 'ReceiverPhone',
+        '身份证号码': '',
+        '线上宝贝名称': '',
+        '线上销售属性': '',
+        '商品名称': 'SkuName',
+        '商品编号/SKU编号': 'SkuNo',
         '数量': 'Count',
-        '单价': 'Price'
+        '单价': 'Price',
+        '交易拍下时间': '',
+        '交易付款时间': '',
+        '物流公司': '',
+        '物流单号': '',
+        '税金': '',
+        '商城扣费': '',
+        '支付交易号': '',
+        '邮编': '',
+        '买家运费': '',
+        '发票抬头': '',
+        '买家留言': '',
+        '卖家备注': '',
+        '货到付款': '',
+        '明细-服务费': '',
+        '门店名称': '',
+        '税率(%)': '',
+        '明细-商城扣费': ''
       }
       Excel.exportExcel(this.data, excelFields, '订单')
     },
@@ -251,6 +329,22 @@ export default {
       const newData = [...this.data]
       const newCacheData = [...this.cacheData]
       const target = newData.filter(item => key === item.Id)[0]
+      const targetCache = newCacheData.filter(item => key === item.Id)[0]
+      if (target && targetCache) {
+        delete target.editable
+        this.data = newData
+        Object.assign(targetCache, target)
+        this.cacheData = newCacheData
+      }
+      this.editingKey = ''
+    },
+    saveAsSuccess (key) {
+      const newData = [...this.data]
+      const newCacheData = [...this.cacheData]
+      const target = newData.filter(item => key === item.Id)[0]
+
+      target.IsError = false
+
       const targetCache = newCacheData.filter(item => key === item.Id)[0]
       if (target && targetCache) {
         delete target.editable
@@ -300,5 +394,11 @@ export default {
 }
 .editable-add-btn {
   margin-bottom: 8px
+}
+</style>
+
+<style>
+.errorRow-highlight {
+  background-color: #f0f9eb;
 }
 </style>

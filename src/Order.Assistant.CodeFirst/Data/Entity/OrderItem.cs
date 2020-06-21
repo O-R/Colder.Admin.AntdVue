@@ -31,12 +31,6 @@ namespace Order.Assistant.CodeFirst.Data.Entity
         public string SkuId { get; set; }
 
         /// <summary>
-        /// Sku
-        /// </summary>
-        [ForeignKey("SkuId")]
-        public Sku Sku { get; set; }
-
-        /// <summary>
         /// 商品名称
         /// </summary>
         [StringLength(100)]

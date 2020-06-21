@@ -10,6 +10,12 @@
         :loading="loading"
       >删除</a-button>
       <a-button type="primary" icon="redo" @click="getDataList()">刷新</a-button>
+      <a-button type="primary" @click="hanldeDownloadTemplate()" :loading="loading" >
+        模板下载
+      </a-button>
+      <a-button type="primary" @click="hanldleImport()" :loading="loading" >
+        导入Excel
+      </a-button>
     </div>
 
     <div class="table-page-search-wrapper">
@@ -64,10 +70,11 @@
 
 <script>
 import EditForm from './EditForm'
+import Excel from '@/utils/excel.js'
 
 const columns = [
-  { title: 'sku编号', dataIndex: 'SkuNo', width: '10%' },
-  { title: 'sku名称', dataIndex: 'SkuName', width: '10%' },
+  { title: 'SKU编号', dataIndex: 'SkuNo', width: '10%' },
+  { title: 'SKU名称', dataIndex: 'SkuName', width: '10%' },
   { title: '关键词', dataIndex: 'KeyWords', width: '10%' },
   { title: '操作', dataIndex: 'action', scopedSlots: { customRender: 'action' } }
 ]
@@ -85,7 +92,7 @@ export default {
       data: [],
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: 20,
         showTotal: (total, range) => `总数:${total} 当前:${range[0]}-${range[1]}`
       },
       filters: {},
@@ -169,6 +176,67 @@ export default {
         .then(resJson => {
           this.customerData = resJson.Data
         })
+    },
+    hanldeDownloadTemplate () {
+      const excelFields = {
+        '商品编码': '',
+        '商品名称': '',
+        '关键词1': '',
+        '关键词2': '',
+        '关键词3': '',
+        '关键词4': '',
+        '关键词5': '',
+        '关键词6': '',
+        '关键词7': '',
+        '关键词8': '',
+        '关键词9': '',
+        '关键词10': '',
+        '关键词11': '',
+        '关键词12': '',
+        '关键词13': '',
+        '关键词14': '',
+        '关键词15': ''
+      }
+      Excel.exportExcel([], excelFields, 'SKU导入模板')
+    },
+    hanldleImport () {
+      var that = this
+      Excel.importExcel((data, dataRef) => {
+        if (data.length < 2) {
+          that.$message.success('导入数据为空!')
+        } else {
+          this.loading = true
+          var list = []
+
+          data.map((d, idx) => {
+            if (idx > 0) {
+              var row = { SkuNo: d[0], SkuName: d[1], KeyWords: '' }
+
+              var keyArr = []
+              for (let i = 2; i < 15; i++) {
+                if (d[i] && d[i].toString().trim()) {
+                  keyArr.push(d[i].toString().trim())
+                }
+              }
+              row.KeyWords = keyArr.toString()
+              list.push(row)
+            }
+          })
+
+          this.$http
+            .post('/OrderAssistant/Sku/Import', list)
+            .then(resJson => {
+              this.loading = false
+
+              if (resJson.Success) {
+                this.$message.success('导入成功!')
+                this.getDataList()
+              } else {
+                this.$message.error('导入异常!')
+              }
+            })
+        }
+      })
     }
   }
 }

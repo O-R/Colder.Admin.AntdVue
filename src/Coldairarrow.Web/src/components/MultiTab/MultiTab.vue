@@ -19,12 +19,14 @@ export default {
       this[action](targetKey)
     },
     remove (targetKey) {
-      this.pages = this.pages.filter(page => page.fullPath !== targetKey)
-      this.fullPathList = this.fullPathList.filter(path => path !== targetKey)
-      // 判断当前标签是否关闭，若关闭则跳转到最后一个还存在的标签页
-      if (!this.fullPathList.includes(this.activeKey)) {
-        this.selectedLastPath()
-      }
+      this.onCloseConfirm(targetKey, () => {
+        this.pages = this.pages.filter(page => page.fullPath !== targetKey)
+        this.fullPathList = this.fullPathList.filter(path => path !== targetKey)
+        // 判断当前标签是否关闭，若关闭则跳转到最后一个还存在的标签页
+        if (!this.fullPathList.includes(this.activeKey)) {
+          this.selectedLastPath()
+        }
+      })
     },
     selectedLastPath () {
       this.activeKey = this.fullPathList[this.fullPathList.length - 1]
@@ -73,6 +75,19 @@ export default {
     },
     closeMenuClick (key, route) {
       this[key](route)
+    },
+    onCloseConfirm (targetKey, callback) {
+      if (targetKey.toLowerCase() === '/orderassistant/order/create') {
+        this.$confirm({
+          title: '提示',
+          content: '正在关闭我要开单页面，是否确定 ?',
+          onOk () {
+            callback()
+          }
+        })
+      } else {
+        callback()
+      }
     },
     renderTabPaneMenu (e) {
       return (
