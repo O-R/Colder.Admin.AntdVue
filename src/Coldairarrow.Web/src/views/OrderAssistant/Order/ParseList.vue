@@ -92,6 +92,7 @@
 </template>
 <script>
 import Excel from '@/utils/excel.js'
+import moment from 'moment'
 
 const columns = [
   {
@@ -271,6 +272,10 @@ export default {
       }
     },
     exportExcel () {
+      if (this.data.length <= 0) {
+        this.$message.warn('请先录入订单信息')
+        return
+      }
       const excelFields = {
         '原始订单编号': 'OrderNo',
         '生成时间': 'CreateTime',
@@ -308,7 +313,9 @@ export default {
         '税率(%)': '',
         '明细-商城扣费': ''
       }
-      Excel.exportExcel(this.data, excelFields, '订单')
+      var t = moment().format('YYYYMMDDHHmmssSSS')
+      var fileId = this.data[0].CustomerName + '-' + t
+      Excel.exportExcel(this.data, excelFields, fileId)
     },
     onDelete (key) {
       const dataSource = [...this.data]

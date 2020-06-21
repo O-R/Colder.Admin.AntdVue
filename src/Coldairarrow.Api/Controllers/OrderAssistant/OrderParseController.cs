@@ -95,52 +95,52 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
 
                 });
                 wordCountDic.ForEach(keyNcount =>
-                  {
-                      var key = keyNcount.Key;
+                {
+                    var key = keyNcount.Key;
 
-                      var findSku = customerSkuList.Where(cs => cs.Sku.KeywordList.Any(kw => kw.Trim() == key))
-                            .OrderBy(cs => cs.SkuId).FirstOrDefault();
+                    var findSku = customerSkuList.Where(cs => cs.Sku.KeywordList.Any(kw => kw.Trim() == key))
+                          .OrderBy(cs => cs.SkuId).FirstOrDefault();
 
-                      if (findSku == null)
-                      {
-                          orderItems.Add(new OrderItem()
-                          {
-                              Id = IdHelper.GetId(),
-                              Count = keyNcount.Value,
-                              OrderId = id,
-                              Price = 0,
-                              SkuId = string.Empty,
-                              SkuName = item.skuKeyWords,
-                              SkuNo = string.Empty,
-                              IsError = true,
-                              ErrorMessage = $"客户{customer.CustomerName},匹配不到关键词{key};" + item.errorMessage
-                          });
-                      }
-                      else
-                      {
-                          var isError = item.isError || keyNcount.Value <= 0;
-                          var errorMessage = keyNcount.Value <= 0 ? "商品数量解析异常;" : string.Empty;
-                          errorMessage += item.isError ? item.errorMessage : string.Empty;
-                          orderItems.Add(new OrderItem()
-                          {
-                              Id = IdHelper.GetId(),
-                              Count = keyNcount.Value,
-                              OrderId = id,
-                              Price = findSku.Price,
-                              SkuId = findSku.Id,
-                              SkuName = findSku.Sku.SkuName,
-                              SkuNo = findSku.Sku.SkuNo,
+                    if (findSku == null)
+                    {
+                        orderItems.Add(new OrderItem()
+                        {
+                            Id = IdHelper.GetId(),
+                            Count = keyNcount.Value,
+                            OrderId = id,
+                            Price = 0,
+                            SkuId = string.Empty,
+                            SkuName = item.skuKeyWords,
+                            SkuNo = string.Empty,
+                            IsError = true,
+                            ErrorMessage = $"客户{customer.CustomerName},匹配不到关键词{key};" + item.errorMessage
+                        });
+                    }
+                    else
+                    {
+                        var isError = item.isError || keyNcount.Value <= 0;
+                        var errorMessage = keyNcount.Value <= 0 ? "商品数量解析异常;" : string.Empty;
+                        errorMessage += item.isError ? item.errorMessage : string.Empty;
+                        orderItems.Add(new OrderItem()
+                        {
+                            Id = IdHelper.GetId(),
+                            Count = keyNcount.Value,
+                            OrderId = id,
+                            Price = findSku.Price,
+                            SkuId = findSku.Id,
+                            SkuName = findSku.Sku.SkuName,
+                            SkuNo = findSku.Sku.SkuNo,
 
-                              IsError = isError,
-                              ErrorMessage = errorMessage
-                          });
-                      }
-                  });
+                            IsError = isError,
+                            ErrorMessage = errorMessage
+                        });
+                    }
+                });
 
                 var order = new Order()
                 {
                     Id = id,
-                    OrderNo = $"WD-{now.ToString("yyMMddHHmmssfff")}{item.index}",
+                    OrderNo = GetOrderNum(id),
                     Address = item.street + item.address,
                     Area = item.county,
                     AreaNo = item.countyCode,
@@ -196,6 +196,16 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
 
             }
             return result;
+        }
+
+        private static string GetOrderNum(string id)
+        {
+            var longId = long.Parse(id);
+            var ticks = (longId >> 22) + 1288834974657L;
+            
+            var time = ticks.UtcToChinaTime();
+
+            return $"WD-{time.ToString("yyMMddHHmmssfff")}{(longId & 0xfff).ToString("X3")}";
         }
 
 
