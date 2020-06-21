@@ -343,6 +343,30 @@ export default {
         Object.assign(targetCache, target)
         this.cacheData = newCacheData
       }
+
+      const targeItems = newData.filter(item => key !== item.Id && item.OrderNo === target.OrderNo)
+      const targetCacheItems = newCacheData.filter(item => key !== item.Id && item.OrderNo === target.OrderNo)
+
+      if (targeItems && targeItems.length > 0 && targetCacheItems && targetCacheItems.length > 0) {
+        targeItems.map(it => {
+          it.Province = target.Province
+          it.City = target.City
+          it.Area = target.Area
+          it.Address = target.Address
+          it.Receiver = target.Receiver
+          it.ReceiverPhone = target.ReceiverPhone
+        })
+
+        targetCacheItems.map(it => {
+          it.Province = target.Province
+          it.City = target.City
+          it.Area = target.Area
+          it.Address = target.Address
+          it.Receiver = target.Receiver
+          it.ReceiverPhone = target.ReceiverPhone
+        })
+      }
+
       this.editingKey = ''
     },
     saveAsSuccess (key) {
@@ -358,6 +382,28 @@ export default {
         this.data = newData
         Object.assign(targetCache, target)
         this.cacheData = newCacheData
+      }
+      const targeItems = newData.filter(item => key !== item.Id && item.OrderNo === target.OrderNo)
+      const targetCacheItems = newCacheData.filter(item => key !== item.Id && item.OrderNo === target.OrderNo)
+
+      if (targeItems && targeItems.length > 0 && targetCacheItems && targetCacheItems.length > 0) {
+        targeItems.map(it => {
+          it.Province = target.Province
+          it.City = target.City
+          it.Area = target.Area
+          it.Address = target.Address
+          it.Receiver = target.Receiver
+          it.ReceiverPhone = target.ReceiverPhone
+        })
+
+        targetCacheItems.map(it => {
+          it.Province = target.Province
+          it.City = target.City
+          it.Area = target.Area
+          it.Address = target.Address
+          it.Receiver = target.Receiver
+          it.ReceiverPhone = target.ReceiverPhone
+        })
       }
       this.editingKey = ''
     },

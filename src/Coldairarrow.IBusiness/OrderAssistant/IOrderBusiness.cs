@@ -10,10 +10,13 @@ namespace Coldairarrow.Business.OrderAssistant
     {
         Task<List<string>> GetExistsIdsAsync(List<string> inputItemIds);
         Task<PageResult<Order>> GetDataListAsync(PageInput<ConditionDTO> input);
+        Task<PageResult<OrderItem>> GetOrderItemListAsync(PageInput<ConditionDTO> input);
 
         Task<Order> GetTheDataAsync(string id);
+        Task<OrderItem> GetTheItemAsync(string id);
         Task AddDataAsync(Order data);
         Task UpdateDataAsync(Order data);
+        Task UpdateItemAsync(OrderItem item);
         Task DeleteDataAsync(List<string> ids);
 
         Task AddManyDataAsync(List<Order> orders);

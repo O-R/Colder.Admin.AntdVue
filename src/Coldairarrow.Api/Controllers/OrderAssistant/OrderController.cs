@@ -3,6 +3,7 @@ using Coldairarrow.Entity.OrderAssistant;
 using Coldairarrow.Util;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Coldairarrow.Api.Controllers.OrderAssistant
@@ -35,6 +36,86 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             return await _orderBus.GetTheDataAsync(input.id);
         }
 
+
+        [HttpPost]
+        public async Task<OrderParseDTO> GetTheItem(IdInputDTO input)
+        {
+            var item = await _orderBus.GetTheItemAsync(input.id);
+            if (item == null)
+            {
+                throw new BusException("查询不到订单数据");
+            }
+            return new OrderParseDTO
+            {
+                Id = item.Id,
+                Address = item.Order.Address,
+                Area = item.Order.Area,
+                AreaNo = item.Order.AreaNo,
+                City = item.Order.City,
+                CityNo = item.Order.CityNo,
+                Count = item.Count,
+                CreateTime = item.Order.CreateTime,
+                CustomerName = item.Order.CustomerName,
+                CustomerNo = item.Order.CustomerNo,
+                Discount = item.Order.Discount,
+                OrderNo = item.Order.OrderNo,
+                Price = item.Price,
+                Province = item.Order.Province,
+                ProvinceNo = item.Order.ProvinceNo,
+                Receiver = item.Order.Receiver,
+                ReceiverPhone = item.Order.ReceiverPhone,
+                SkuName = item.SkuName,
+                SkuNo = item.SkuNo,
+                SkuId = item.SkuId,
+                OrderId = item.Order.Id,
+                CustomerId = item.Order.CustomerId,
+                TotalPrice = item.Order.TotalPrice
+            };
+        }
+
+        [HttpPost]
+        public async Task<PageResult<OrderParseDTO>> GetItemList(PageInput<ConditionDTO> input)
+        {
+            var page = await _orderBus.GetOrderItemListAsync(input);
+
+            var returnPage = new PageResult<OrderParseDTO>()
+            {
+                ErrorCode = page.ErrorCode,
+                Msg = page.Msg,
+                Success = page.Success,
+                Total = page.Total
+            };
+            returnPage.Data = page?.Data?.Select(item => new OrderParseDTO
+            {
+                Id = item.Id,
+                Address = item.Order.Address,
+                Area = item.Order.Area,
+                AreaNo = item.Order.AreaNo,
+                City = item.Order.City,
+                CityNo = item.Order.CityNo,
+                Count = item.Count,
+                CreateTime = item.Order.CreateTime,
+                CustomerName = item.Order.CustomerName,
+                CustomerNo = item.Order.CustomerNo,
+                Discount = item.Order.Discount,
+                OrderNo = item.Order.OrderNo,
+                Price = item.Price,
+                Province = item.Order.Province,
+                ProvinceNo = item.Order.ProvinceNo,
+                Receiver = item.Order.Receiver,
+                ReceiverPhone = item.Order.ReceiverPhone,
+                SkuName = item.SkuName,
+                SkuNo = item.SkuNo,
+                SkuId = item.SkuId,
+                OrderId = item.Order.Id,
+                CustomerId = item.Order.CustomerId,
+                TotalPrice = item.Order.TotalPrice
+            }).ToList() ?? new List<OrderParseDTO>();
+
+            return returnPage;
+
+        }
+
         #endregion
 
         #region 提交
@@ -52,6 +133,33 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             {
                 await _orderBus.UpdateDataAsync(data);
             }
+        }
+
+
+        [HttpPost]
+        public async Task SaveItem(OrderParseDTO data)
+        {
+            var orderItem = new OrderItem()
+            {
+                Id = data.Id,
+                OrderId = data.OrderId,
+                Order = new Order()
+                {
+                    Province = data.Province,
+                    City = data.City,
+                    Area = data.Area,
+                    Address = data.Address,
+                    Receiver = data.Receiver,
+                    ReceiverPhone = data.ReceiverPhone,
+                },
+                SkuId = data.SkuId,
+                SkuNo = data.SkuNo,
+                SkuName = data.SkuName,
+                Price = data.Price,
+                Count = data.Count
+            };
+
+            await _orderBus.UpdateItemAsync(orderItem);
         }
 
         [HttpPost]

@@ -42,6 +42,8 @@ namespace Coldairarrow.Entity.OrderAssistant
         /// </summary>
         public String OrderId { get; set; }
 
+        public Order Order { get; set; }
+
         /// <summary>
         /// sku编号
         /// </summary>
