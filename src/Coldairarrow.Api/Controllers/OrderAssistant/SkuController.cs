@@ -106,6 +106,7 @@ namespace Coldairarrow.Api.Controllers.OrderAssistant
             list.ForEach(it =>
             {
                 InitEntity(it);
+                it.KeyWords = string.Join(',', it.KeywordList.Distinct());
             });
             await _skuBus.AddDataListAsync(list);
         }
