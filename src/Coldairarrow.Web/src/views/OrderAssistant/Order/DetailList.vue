@@ -41,7 +41,7 @@
       :rowKey="row => row.Id"
       :pagination="pagination"
       @change="handleTableChange"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      :rowSelection="{ fixed: true, selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       bordered >
       <span slot="operation" slot-scope="text, record">
         <template>

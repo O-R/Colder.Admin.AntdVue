@@ -1,5 +1,13 @@
 <template>
   <div style="text-align: right">
+    <a-button
+      type="primary"
+      class="delete-btn"
+      icon="minus"
+      @click="handleDelete(selectedRowKeys)"
+      :disabled="!hasSelected()"
+      :loading="loading"
+    >删除</a-button>
     <a-button type="primary" class="import-btn" @click="hanldeDownloadTemplate()" :loading="loading" >
       模板下载
     </a-button>
@@ -15,6 +23,7 @@
       :loading="loading"
       :pagination="pagination"
       @change="handleTableChange"
+      :rowSelection="{ fixed: true, selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       :scroll="{ y: 300 }"
       bordered>
       <template
@@ -77,7 +86,7 @@ const columns = [
   {
     title: '型号',
     dataIndex: 'skus',
-    width: '40%',
+    width: '35%',
     scopedSlots: { customRender: 'skus' }
   },
   {
@@ -105,6 +114,7 @@ export default {
       data,
       columns,
       editingKey: '',
+      selectedRowKeys: [],
       pagination: {
         current: 1,
         pageSize: 20,
@@ -114,6 +124,25 @@ export default {
     }
   },
   methods: {
+    onSelectChange (selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
+    },
+    hasSelected () {
+      return this.selectedRowKeys.length > 0
+    },
+    handleDelete (ids) {
+      var that = this
+      this.$confirm({
+        title: '确认删除吗?',
+        onOk () {
+          const dataSource = [...that.data]
+          const filterData = dataSource.filter(item => !ids.includes(item.key))
+          that.data = filterData
+          that.setCacheData(filterData)
+          that.selectedRowKeys = []
+        }
+      })
+    },
     setCacheData (d) {
       this.cacheData = d.map(item => ({ ...item }))
     },
@@ -264,6 +293,10 @@ export default {
   margin-bottom: 8px
 }
 .import-btn {
+  margin-bottom: 8px;
+  margin-right: 20px;
+}
+.delete-btn {
   margin-bottom: 8px;
   margin-right: 20px;
 }

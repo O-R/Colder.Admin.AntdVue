@@ -1,16 +1,25 @@
 <template>
   <div style="text-align: right">
 
+    <a-button
+      type="primary"
+      class="delete-btn"
+      icon="minus"
+      @click="handleDelete(selectedRowKeys)"
+      :disabled="!hasSelected()"
+      :loading="loading"
+    >删除</a-button>
     <a-button type="primary" class="editable-add-btn" :loading="loading" @click="exportExcel" >
       导出excel
     </a-button>
     <a-table
       :columns="columns"
       :data-source="data"
-      :scroll="{ x: '200%',y: 300 }"
+      :scroll="{ x: '230%',y: 300 }"
       :loading="loading"
       :rowClassName="setRowClassName"
       :pagination="pagination"
+      :rowSelection="{ fixed: true, selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       @change="handleTableChange"
       bordered >
       <template
@@ -51,6 +60,15 @@
             :min="0"
             :precision="2"
             @change="num => handleChange(num, record.Id, col)"
+          />
+          <a-textarea
+            v-else-if="record.editable && col==='Address'"
+            v-model="record.Address"
+            style="margin: -5px 0"
+            placeholder=""
+            :rows="3"
+            autocomplete="off"
+            @change="e => handleChange(e.target.value, record.Id, col)"
           />
           <a-input
             v-else-if="record.editable"
@@ -99,7 +117,7 @@ const columns = [
   {
     title: '原始订单编号',
     dataIndex: 'OrderNo',
-    width: '10%',
+    width: '15%',
     // fixed: 'left',
     scopedSlots: { customRender: 'OrderNo' }
   },
@@ -120,24 +138,24 @@ const columns = [
   {
     title: '省',
     dataIndex: 'Province',
-    width: '5%',
+    width: '10%',
     scopedSlots: { customRender: 'Province' }
   },
   {
     title: '市',
-    width: '5%',
+    width: '10%',
     dataIndex: 'City',
     scopedSlots: { customRender: 'City' }
   },
   {
     title: '区',
-    width: '5%',
+    width: '10%',
     dataIndex: 'Area',
     scopedSlots: { customRender: 'Area' }
   },
   {
     title: '收货地址',
-    width: '20%',
+    width: '30%',
     dataIndex: 'Address',
     scopedSlots: { customRender: 'Address' }
   },
@@ -149,7 +167,7 @@ const columns = [
   },
   {
     title: '收货人手机',
-    width: '10%',
+    width: '15%',
     dataIndex: 'ReceiverPhone',
     scopedSlots: { customRender: 'ReceiverPhone' }
   },
@@ -167,13 +185,13 @@ const columns = [
   },
   {
     title: '数量',
-    width: '5%',
+    width: '10%',
     dataIndex: 'Count',
     scopedSlots: { customRender: 'Count' }
   },
   {
     title: '单价',
-    width: '5%',
+    width: '10%',
     dataIndex: 'Price',
     scopedSlots: { customRender: 'Price' }
   },
@@ -181,7 +199,7 @@ const columns = [
     title: '操作',
     dataIndex: 'operation',
     // fixed: 'right',
-    width: '10%',
+    width: '25%',
     scopedSlots: { customRender: 'operation' }
   }
 ]
@@ -207,6 +225,7 @@ export default {
       SuccessRowCount: 0,
       ErrorRowCount: 0,
       visible: false,
+      selectedRowKeys: [],
       pagination: {
         current: 1,
         pageSize: 40,
@@ -227,6 +246,25 @@ export default {
     }
   },
   methods: {
+    onSelectChange (selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
+    },
+    hasSelected () {
+      return this.selectedRowKeys.length > 0
+    },
+    handleDelete (ids) {
+      var that = this
+      this.$confirm({
+        title: '确认删除吗?',
+        onOk () {
+          const dataSource = [...that.data]
+          const filterData = dataSource.filter(item => !ids.includes(item.key))
+          that.data = filterData
+          that.setCacheData(filterData)
+          that.selectedRowKeys = []
+        }
+      })
+    },
     setData (d) {
       this.data = d
       this.setCacheData(d)
@@ -454,10 +492,14 @@ export default {
 .editable-add-btn {
   margin-bottom: 8px
 }
+.delete-btn {
+  margin-bottom: 8px;
+  margin-right: 20px;
+}
 </style>
 
 <style>
-.errorRow-highlight {
+.errorRow-highlight{
   background-color:#dc3545;
 }
 </style>
