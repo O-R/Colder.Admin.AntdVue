@@ -11,6 +11,7 @@
       :loading="loading"
       :rowClassName="setRowClassName"
       :pagination="pagination"
+      @change="handleTableChange"
       bordered >
       <template
         v-for="col in ['Province','City','Area','Address','Receiver','ReceiverPhone','SkuName','SkuNo','Count','Price']"
@@ -270,6 +271,11 @@ export default {
         this.data = newData
         // Object.assign(this.data, newData)
       }
+    },
+    handleTableChange (pagination, filters, sorter) {
+      this.pagination = { ...pagination }
+      this.filters = { ...filters }
+      this.sorter = { ...sorter }
     },
     exportExcel () {
       if (this.data.length <= 0) {

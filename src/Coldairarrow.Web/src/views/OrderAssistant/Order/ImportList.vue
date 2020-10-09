@@ -9,7 +9,13 @@
     <a-button type="primary" class="editable-add-btn" @click="hanldleAdd()" :loading="loading" >
       新增行
     </a-button>
-    <a-table :columns="columns" :data-source="data" :loading="loading" :pagination="pagination" bordered>
+    <a-table
+      :columns="columns"
+      :data-source="data"
+      :loading="loading"
+      :pagination="pagination"
+      @change="handleTableChange"
+      bordered>
       <template
         v-for="col in ['address','skus']"
         :slot="col"
@@ -117,6 +123,11 @@ export default {
         target[column] = value
         this.data = newData
       }
+    },
+    handleTableChange (pagination, filters, sorter) {
+      this.pagination = { ...pagination }
+      this.filters = { ...filters }
+      this.sorter = { ...sorter }
     },
     getParseData () {
       var that = this
