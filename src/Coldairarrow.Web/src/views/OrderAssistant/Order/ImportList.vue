@@ -15,6 +15,7 @@
       :loading="loading"
       :pagination="pagination"
       @change="handleTableChange"
+      :scroll="{ y: 300 }"
       bordered>
       <template
         v-for="col in ['address','skus']"

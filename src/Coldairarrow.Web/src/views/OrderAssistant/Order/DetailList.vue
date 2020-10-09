@@ -36,7 +36,7 @@
     <a-table
       :columns="columns"
       :data-source="data"
-      :scroll="{ x: '200%' }"
+      :scroll="{ x: '200%',y: 300 }"
       :loading="loading"
       :rowKey="row => row.Id"
       :pagination="pagination"
