@@ -458,6 +458,6 @@ export default {
 
 <style>
 .errorRow-highlight {
-  background-color: #f0f9eb;
+  background-color:#dc3545;
 }
 </style>
