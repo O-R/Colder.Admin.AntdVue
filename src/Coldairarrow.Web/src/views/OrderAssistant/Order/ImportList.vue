@@ -18,6 +18,7 @@
       新增行
     </a-button>
     <a-table
+      :rowKey="row => row.key"
       :columns="columns"
       :data-source="data"
       :loading="loading"
@@ -182,7 +183,9 @@ export default {
       return this.data.map(item => {
         var addr = {}
         try {
-          addr = that.smartParse(item.address)
+          // item.address = item.address.split(' ').join('')
+          // item.address = this.handleMunicipality(item.address)
+          addr = that.$smartParse(item.address)
         } catch (error) {
           addr = Object.assign(addr, defaultItem)
           addr.isError = true
@@ -201,6 +204,17 @@ export default {
 
         return addr
       })
+    },
+    handleMunicipality (address) {
+      address = address.replace('北京北京', '北京')
+      address = address.replace('上海上海', '上海')
+      address = address.replace('重庆重庆', '重庆')
+      address = address.replace('天津天津', '天津')
+      address = address.replace('北京市北京', '北京')
+      address = address.replace('上海市上海', '上海')
+      address = address.replace('重庆市重庆', '重庆')
+      address = address.replace('天津市天津', '天津')
+      return address
     },
     onDelete (key) {
       const dataSource = [...this.data]

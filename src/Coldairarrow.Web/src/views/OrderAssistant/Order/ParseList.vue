@@ -13,6 +13,7 @@
       导出excel
     </a-button>
     <a-table
+      :rowKey="(record)=>record.Id"
       :columns="columns"
       :data-source="data"
       :scroll="{ x: '230%',y: 300 }"
@@ -258,7 +259,7 @@ export default {
         title: '确认删除吗?',
         onOk () {
           const dataSource = [...that.data]
-          const filterData = dataSource.filter(item => !ids.includes(item.key))
+          const filterData = dataSource.filter(item => !ids.includes(item.Id))
           that.data = filterData
           that.setCacheData(filterData)
           that.selectedRowKeys = []
@@ -266,6 +267,9 @@ export default {
       })
     },
     setData (d) {
+      // d.map(it => {
+      //   it.Key = it.Id
+      // })
       this.data = d
       this.setCacheData(d)
 
@@ -283,7 +287,16 @@ export default {
       this.cacheData = d.map(item => ({ ...item }))
     },
     setRowClassName (record, index) {
-      return record.IsError ? 'errorRow-highlight' : ''
+      if (record.IsError === false) {
+        return ''
+      } else {
+        if (this.selectedRowKeys.includes(record.Id)) {
+          return 'errorRow-selected-highlight'
+        } else {
+          return 'errorRow-highlight'
+        }
+      }
+      // return record.IsError ? 'errorRow-highlight' : ''
     },
     handleKnowResult () {
       this.visible = false
@@ -499,7 +512,8 @@ export default {
 </style>
 
 <style>
-.errorRow-highlight{
-  background-color:#dc3545;
+.ant-table-row.errorRow-highlight,
+.ant-table-row.errorRow-selected-highlight{
+  background-color:#dc3545 !important;
 }
 </style>
