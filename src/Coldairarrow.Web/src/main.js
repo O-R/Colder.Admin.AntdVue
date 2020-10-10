@@ -16,7 +16,8 @@ import './core/use'
 import './permission' // permission control
 import './utils/filter' // global filter
 import operatorPlugin from './utils/plugin/operator-plugin'
-import smartParse from 'vue-smart-parse'
+// import smartParse from 'vue-smart-parse'
+import smartParsePlugin from '@/utils/plugin/smart-parse-plugin'
 
 import moment from 'moment'
 moment.prototype.toJSON = function () { return moment(this).format('YYYY-MM-DD HH:mm:ss') }
@@ -27,7 +28,7 @@ Vue.config.productionTip = false
 // Vue.use(VueAxios)
 Vue.use(AxiosPlugin)
 Vue.use(operatorPlugin)
-Vue.use(smartParse)
+Vue.use(smartParsePlugin)
 
 new Vue({
   router,

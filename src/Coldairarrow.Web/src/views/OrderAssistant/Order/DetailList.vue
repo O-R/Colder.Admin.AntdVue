@@ -36,12 +36,12 @@
     <a-table
       :columns="columns"
       :data-source="data"
-      :scroll="{ x: '200%' }"
+      :scroll="{ x: '200%',y: 300 }"
       :loading="loading"
       :rowKey="row => row.Id"
       :pagination="pagination"
       @change="handleTableChange"
-      :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+      :rowSelection="{ fixed: true, selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
       bordered >
       <span slot="operation" slot-scope="text, record">
         <template>

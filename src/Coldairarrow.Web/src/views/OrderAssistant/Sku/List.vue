@@ -46,6 +46,7 @@
     <a-table
       ref="table"
       :columns="columns"
+      :scroll="{ y: 300 }"
       :rowKey="row => row.Id"
       :dataSource="data"
       :pagination="pagination"
